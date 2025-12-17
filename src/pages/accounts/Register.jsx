@@ -8,116 +8,121 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (!/^[a-zA-Z0-9@.+\-_]+$/.test(username)) {
+      newErrors.username = "Only letters, numbers, and @ . + - _ are allowed";
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    if (!validate()) return;
+
     try {
-      console.log("Sending registration request:", { username, email, password: "***", password2: "***" });
-      const res = await api.post("register/", { username, email, password, password2: confirmPassword });
-      console.log("User registered:", res.data);
+      await api.post("register/", {
+        username,
+        email,
+        password,
+        password2: confirmPassword,
+      });
+
       alert("Registration successful!");
       setUsername("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setErrors({});
     } catch (err) {
-      console.error("Registration error:", err);
-      console.error("Error response:", err.response?.data);
-      
-      // Collect all validation errors
-      const errors = [];
-      
       if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        // Handle Django REST Framework errors - collect all field errors
-        if (errorData.non_field_errors) {
-          const nonFieldErrors = Array.isArray(errorData.non_field_errors) 
-            ? errorData.non_field_errors 
-            : [errorData.non_field_errors];
-          errors.push(...nonFieldErrors);
-        }
-        
-        if (errorData.username) {
-          const usernameErrors = Array.isArray(errorData.username) ? errorData.username : [errorData.username];
-          errors.push(`Username: ${usernameErrors[0]}`);
-        }
-        
-        if (errorData.email) {
-          const emailErrors = Array.isArray(errorData.email) ? errorData.email : [errorData.email];
-          errors.push(`Email: ${emailErrors[0]}`);
-        }
-        
-        if (errorData.password) {
-          const passwordErrors = Array.isArray(errorData.password) ? errorData.password : [errorData.password];
-          errors.push(`Password: ${passwordErrors[0]}`);
-        }
-        
-        if (errorData.password2) {
-          const password2Errors = Array.isArray(errorData.password2) ? errorData.password2 : [errorData.password2];
-          errors.push(`Confirm Password: ${password2Errors[0]}`);
-        }
-        
-        if (errorData.message) {
-          errors.push(errorData.message);
-        } else if (errorData.error) {
-          errors.push(errorData.error);
-        } else if (errorData.detail) {
-          errors.push(errorData.detail);
-        }
+        setErrors(err.response.data);
+      } else {
+        alert("Registration failed!");
       }
-      
-      const errorMessage = errors.length > 0 
-        ? errors.join('\n') 
-        : err.message || "Registration failed!";
-      
-      alert(`Registration failed:\n\n${errorMessage}`);
     }
   };
 
   return (
     <div className="accounts-container">
       <h2>Join Us</h2>
+
       <form onSubmit={handleRegister} noValidate>
-        <label>Username</label>
-        <input
-          type="text"
-          placeholder="Letters, numbers, and @/./+/-/_ only"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          pattern="[a-zA-Z0-9@.+\-_]+"
-        />
-        <label>Email</label>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label>Password (min. 8 characters)</label>
-        <input
-          type="password"
-          placeholder="At least 8 characters"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-        />
-        <label>Confirm Password</label>
-        <input
-          type="password"
-          placeholder="Confirm password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Register</button>
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            className="form-field"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          {errors.username && <p className="error-text">{errors.username}</p>}
+        </div>
+
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            className="form-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {errors.email && <p className="error-text">{errors.email}</p>}
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            className="form-field"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {errors.password && <p className="error-text">{errors.password}</p>}
+        </div>
+
+        <div className="form-group">
+          <label>Confirm Password</label>
+          <input
+            type="password"
+            className="form-field"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          {errors.confirmPassword && (
+            <p className="error-text">{errors.confirmPassword}</p>
+          )}
+        </div>
+
+        <button className="submit-btn" type="submit">
+          Register
+        </button>
+
         <div className="login-link">
           Already have an account? <Link to="/login">Login</Link>
         </div>

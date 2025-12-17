@@ -13,6 +13,12 @@
     color: #333;
   }
 
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+
   form {
     display: flex;
     flex-direction: column;
@@ -21,35 +27,6 @@
       margin-bottom: 5px;
       font-size: 0.9rem;
       color: #555;
-    }
-
-    input {
-      padding: 10px 12px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-
-      &:focus {
-        outline: none;
-        border-color: #4caf50;
-        box-shadow: 0 0 5px rgba(76,175,80,0.4);
-      }
-    }
-
-    button {
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
-      background-color: #4caf50;
-      color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-
-      &:hover {
-        background-color: #45a049;
-      }
     }
 
     .login-link {

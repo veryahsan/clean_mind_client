@@ -2,94 +2,109 @@ import React, { useState } from "react";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
 import "./accounts.scss";
+import "../../styles/globals.scss"
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!username.trim()) {
+      newErrors.username = "Username is required";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
+
     try {
       const res = await api.post("login/", { username, password });
-      console.log("User logged in:", res.data);
-      // Store tokens if provided (TokenObtainPairView returns 'access' and 'refresh')
       if (res.data.access) {
         localStorage.setItem("access_token", res.data.access);
       }
       if (res.data.refresh) {
         localStorage.setItem("refresh_token", res.data.refresh);
       }
-      // Also handle alternative token field names
       if (res.data.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
       }
       if (res.data.refresh_token) {
         localStorage.setItem("refresh_token", res.data.refresh_token);
       }
-      alert("Login successful!");
+
+      setSuccessMessage("Login successful");
+      setTimeout(() => setSuccessMessage(""), 3000);
+
       setUsername("");
       setPassword("");
+      setErrors({});
     } catch (err) {
-      console.error("Login error:", err);
-      console.error("Error response:", err.response?.data);
-      
-      // Collect all validation errors
-      const errors = [];
-      
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        if (errorData.non_field_errors) {
-          const nonFieldErrors = Array.isArray(errorData.non_field_errors) 
-            ? errorData.non_field_errors 
-            : [errorData.non_field_errors];
-          errors.push(...nonFieldErrors);
-        }
-        
-        if (errorData.username) {
-          const usernameErrors = Array.isArray(errorData.username) ? errorData.username : [errorData.username];
-          errors.push(`Username: ${usernameErrors[0]}`);
-        }
-        
-        if (errorData.password) {
-          const passwordErrors = Array.isArray(errorData.password) ? errorData.password : [errorData.password];
-          errors.push(`Password: ${passwordErrors[0]}`);
-        }
-        
-        if (errorData.detail) {
-          errors.push(errorData.detail);
-        }
+      const errorData = err.response?.data || {};
+      const newErrors = {};
+
+      if (errorData.detail) {
+        newErrors.password = errorData.detail;
       }
-      
-      const errorMessage = errors.length > 0 
-        ? errors.join('\n') 
-        : err.message || "Login failed!";
-      
-      alert(`Login failed:\n\n${errorMessage}`);
+
+      if (errorData.username) {
+        newErrors.username = errorData.username[0];
+      }
+
+      if (errorData.password) {
+        newErrors.password = errorData.password[0];
+      }
+
+      if (Object.keys(newErrors).length === 0) {
+        newErrors.password = "Invalid username or password";
+      }
+
+      setErrors(newErrors);
     }
   };
 
   return (
     <div className="accounts-container">
       <h2>Login</h2>
+
+      {successMessage && <div className="success-slider">{successMessage}</div>}
+
       <form onSubmit={handleLogin} noValidate>
-        <label>Username</label>
-        <input
-          type="text"
-          placeholder="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            value={username}
+            className="form-field"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          {errors.username && <p className="error-text">{errors.username}</p>}
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            className="form-field"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {errors.password && <p className="error-text">{errors.password}</p>}
+        </div>
+
+        <button type="submit" className="submit-btn">Login</button>
+
         <div className="login-link">
           Don't have an account? <Link to="/register">Register</Link>
         </div>
