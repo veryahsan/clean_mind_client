@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import api from "../../services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -9,33 +11,28 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = {};
 
-    if (!username.trim()) {
-      newErrors.username = "Username is required";
-    } else if (!/^[a-zA-Z0-9@.+\-_]+$/.test(username)) {
+    if (!username.trim()) newErrors.username = "Username is required";
+    else if (!/^[a-zA-Z0-9@.+\-_]+$/.test(username))
       newErrors.username = "Only letters, numbers, and @ . + - _ are allowed";
-    }
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       newErrors.email = "Enter a valid email address";
-    }
 
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 8) {
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 8)
       newErrors.password = "Password must be at least 8 characters";
-    }
 
-    if (!confirmPassword) {
+    if (!confirmPassword)
       newErrors.confirmPassword = "Please confirm your password";
-    } else if (password !== confirmPassword) {
+    else if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,6 +42,8 @@ const Register = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    setLoading(true);
+    setErrors({});
     try {
       await api.post("register/", {
         username,
@@ -53,15 +52,21 @@ const Register = () => {
         password2: confirmPassword,
       });
 
-      setSuccessMessage("Registration successful!");
+      setSuccessMessage("Registration successful! Redirecting to login...");
       setUsername("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      setErrors({});
+
+      setTimeout(() => {
+        setSuccessMessage("");
+        navigate("/login");
+      }, 2000);
     } catch (err) {
       if (err.response?.data) setErrors(err.response.data);
       else alert("Registration failed!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,13 +78,12 @@ const Register = () => {
         </h2>
 
         {successMessage && (
-          <div className="bg-green-500 text-white rounded-md px-4 py-2 mb-4">
+          <div className="bg-green-500 text-white rounded-md px-4 py-2 mb-4 text-center">
             {successMessage}
           </div>
         )}
 
         <form onSubmit={handleRegister} noValidate className="space-y-4">
-          {/* Username */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Username
@@ -89,13 +93,13 @@ const Register = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.username && (
               <p className="text-red-600 text-sm mt-1">{errors.username}</p>
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Email
@@ -105,13 +109,13 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.email && (
               <p className="text-red-600 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Password
@@ -121,13 +125,13 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.password && (
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Confirm Password
@@ -137,6 +141,7 @@ const Register = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.confirmPassword && (
               <p className="text-red-600 text-sm mt-1">
@@ -147,9 +152,16 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition"
+            disabled={loading}
+            className="w-full bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition flex justify-center items-center"
           >
-            Register
+            {loading ? (
+              <Box sx={{ display: "flex" }}>
+                <CircularProgress size={24} color="inherit" />
+              </Box>
+            ) : (
+              "Register"
+            )}
           </button>
         </form>
 

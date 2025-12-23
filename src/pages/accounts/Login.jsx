@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import api from "../../services/api";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -20,16 +26,35 @@ const Login = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    try {
-      await api.post("login/", { username, password });
+    setLoading(true);
+    setErrors({});
+    setSuccessMessage("");
+
+    const result = await login(username, password);
+
+    if (result.success) {
       setSuccessMessage("Login successful!");
       setUsername("");
       setPassword("");
-      setErrors({});
-    } catch (err) {
-      if (err.response?.data) setErrors(err.response.data);
-      else alert("Login failed!");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
+    } else {
+      // Handle errors from the context
+      const errorData = result.error;
+      if (errorData.non_field_errors) {
+        setErrors({ ...errors, general: errorData.non_field_errors[0] || errorData.non_field_errors });
+      } else if (errorData.username) {
+        setErrors({ username: Array.isArray(errorData.username) ? errorData.username[0] : errorData.username });
+      } else if (errorData.password) {
+        setErrors({ password: Array.isArray(errorData.password) ? errorData.password[0] : errorData.password });
+      } else {
+        setErrors({ general: "Login failed. Please try again." });
+      }
     }
+
+    setLoading(false);
   };
 
   return (
@@ -45,8 +70,13 @@ const Login = () => {
           </div>
         )}
 
+        {errors.general && (
+          <div className="bg-red-500 text-white rounded-md px-4 py-2 mb-4">
+            {errors.general}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} noValidate className="space-y-4">
-          {/* Username */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Username
@@ -56,13 +86,13 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.username && (
               <p className="text-red-600 text-sm mt-1">{errors.username}</p>
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Password
@@ -72,6 +102,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             />
             {errors.password && (
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
@@ -80,8 +111,16 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition"
+            className={`w-full flex justify-center items-center gap-2 bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition ${
+              loading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
           >
+            {loading && (
+              <Box sx={{ display: "flex" }}>
+                <CircularProgress size={20} color="inherit" />
+              </Box>
+            )}
             Login
           </button>
         </form>
