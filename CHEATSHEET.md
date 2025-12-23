@@ -48,3 +48,4 @@ cd ~/Desktop/clean_mind_client && npm run dev
 - Server: http://localhost:3000
 - Admin: http://localhost:3000/admin/
 
+

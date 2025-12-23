@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import api from "../../services/api";
 import { Link } from "react-router-dom";
-import "./accounts.scss";
-import "../../styles/globals.scss"
+import api from "../../services/api";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -12,15 +10,8 @@ const Login = () => {
 
   const validate = () => {
     const newErrors = {};
-
-    if (!username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    }
-
+    if (!username.trim()) newErrors.username = "Username is required";
+    if (!password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -30,85 +21,78 @@ const Login = () => {
     if (!validate()) return;
 
     try {
-      const res = await api.post("login/", { username, password });
-      if (res.data.access) {
-        localStorage.setItem("access_token", res.data.access);
-      }
-      if (res.data.refresh) {
-        localStorage.setItem("refresh_token", res.data.refresh);
-      }
-      if (res.data.access_token) {
-        localStorage.setItem("access_token", res.data.access_token);
-      }
-      if (res.data.refresh_token) {
-        localStorage.setItem("refresh_token", res.data.refresh_token);
-      }
-
-      setSuccessMessage("Login successful");
-      setTimeout(() => setSuccessMessage(""), 3000);
-
+      await api.post("login/", { username, password });
+      setSuccessMessage("Login successful!");
       setUsername("");
       setPassword("");
       setErrors({});
     } catch (err) {
-      const errorData = err.response?.data || {};
-      const newErrors = {};
-
-      if (errorData.detail) {
-        newErrors.password = errorData.detail;
-      }
-
-      if (errorData.username) {
-        newErrors.username = errorData.username[0];
-      }
-
-      if (errorData.password) {
-        newErrors.password = errorData.password[0];
-      }
-
-      if (Object.keys(newErrors).length === 0) {
-        newErrors.password = "Invalid username or password";
-      }
-
-      setErrors(newErrors);
+      if (err.response?.data) setErrors(err.response.data);
+      else alert("Login failed!");
     }
   };
 
   return (
-    <div className="accounts-container">
-      <h2>Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-md shadow-md w-full max-w-md p-8">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">
+          Login
+        </h2>
 
-      {successMessage && <div className="success-slider">{successMessage}</div>}
+        {successMessage && (
+          <div className="bg-green-500 text-white rounded-md px-4 py-2 mb-4">
+            {successMessage}
+          </div>
+        )}
 
-      <form onSubmit={handleLogin} noValidate>
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            className="form-field"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          {errors.username && <p className="error-text">{errors.username}</p>}
-        </div>
+        <form onSubmit={handleLogin} noValidate className="space-y-4">
+          {/* Username */}
+          <div>
+            <label className="block mb-1 text-gray-700 dark:text-gray-200">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+            />
+            {errors.username && (
+              <p className="text-red-600 text-sm mt-1">{errors.username}</p>
+            )}
+          </div>
 
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-field"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {errors.password && <p className="error-text">{errors.password}</p>}
-        </div>
+          {/* Password */}
+          <div>
+            <label className="block mb-1 text-gray-700 dark:text-gray-200">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+            />
+            {errors.password && (
+              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
-        <button type="submit" className="submit-btn">Login</button>
+          <button
+            type="submit"
+            className="w-full bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition"
+          >
+            Login
+          </button>
+        </form>
 
-        <div className="login-link">
-          Don't have an account? <Link to="/register">Register</Link>
-        </div>
-      </form>
+        <p className="text-center text-gray-600 dark:text-gray-300 mt-4 text-sm">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-primary hover:underline">
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
