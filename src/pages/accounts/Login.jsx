@@ -38,7 +38,7 @@ const Login = () => {
       setPassword("");
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/member-dashboard");
       }, 800);
     } else {
       // Handle errors from the context

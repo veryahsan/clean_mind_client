@@ -1,80 +1,74 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from "react";
+import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const storedToken = localStorage.getItem("access_token");
+  const storedUser = localStorage.getItem("user");
+
+  const [token, setToken] = useState(storedToken);
+  const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!storedToken);
   const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState(() => {
-    return localStorage.getItem("access_token");
-  });
 
   const checkAuth = async () => {
     const storedToken = localStorage.getItem("access_token");
-    if (storedToken) {
-      setToken(storedToken);
-      // Try to get user data from localStorage first
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-          setIsAuthenticated(true);
-        } catch (e) {
-          console.error("Error parsing stored user:", e);
-        }
-      }
-      // Optionally verify token by fetching user data from API
-      // Uncomment this if you have a user endpoint:
-      /*
-      try {
-        const response = await api.get("user/");
-        setUser(response.data);
-        localStorage.setItem("user", JSON.stringify(response.data));
-        setIsAuthenticated(true);
-      } catch (error) {
-        // Token might be expired or invalid
-        console.error("Auth check failed:", error);
-        logout();
-      }
-      */
-    } else {
-      setIsAuthenticated(false);
+    if (!storedToken) {
       setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+
+    setToken(storedToken);
+
+    try {
+      const decoded = jwtDecode(storedToken);
+      const userData = {
+        id: decoded.user_id,
+        username: decoded.username,
+        role: decoded.role,
+      };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setIsAuthenticated(true);
+    } catch (e) {
+      console.error("Failed to decode token:", e);
+      logout();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     checkAuth();
-  }, []); 
+  }, []);
 
   const login = async (username, password) => {
     try {
       const response = await api.post("login/", { username, password });
-      const { access, refresh, user: userData } = response.data;
+      const { access, refresh } = response.data;
 
-      // Store tokens
       if (access) {
         localStorage.setItem("access_token", access);
         setToken(access);
-      }
-      if (refresh) {
-        localStorage.setItem("refresh_token", refresh);
-      }
 
-      // Store user data if provided
-      if (userData) {
+        const decoded = jwtDecode(access);
+        const userData = {
+          id: decoded.user_id,
+          username: decoded.username,
+          role: decoded.role,
+        };
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
-      } else {
-        // If user data is not in response, you can fetch it here
-        // Or store basic info like username from the login response
-        // For now, we'll just mark as authenticated since we have the token
+        setIsAuthenticated(true);
       }
 
-      setIsAuthenticated(true);
+      if (refresh) localStorage.setItem("refresh_token", refresh);
+
       return { success: true };
     } catch (error) {
       console.error("Login failed:", error);
@@ -97,7 +91,6 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await api.post("register/", userData);
-      // After successful registration, you might want to auto-login
       return { success: true, data: response.data };
     } catch (error) {
       console.error("Registration failed:", error);
@@ -115,9 +108,9 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token,
     isAuthenticated,
     isLoading,
-    token,
     login,
     logout,
     register,
@@ -128,11 +121,8 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
