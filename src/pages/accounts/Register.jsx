@@ -73,8 +73,8 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-md shadow-md w-full max-w-md p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">
-          Sign Up
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Start your healthy routine
         </h2>
 
         {successMessage && (

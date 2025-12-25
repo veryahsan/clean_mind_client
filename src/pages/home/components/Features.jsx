@@ -4,7 +4,6 @@ import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import ForumIcon from "@mui/icons-material/Forum";
 import AssistantIcon from "@mui/icons-material/Assistant";
 
-
 const Features = () => (
   <section className="bg-white dark:bg-gray-900 py-20">
     <div className="mx-auto max-w-screen-xl px-6 lg:px-8 text-center">
@@ -19,7 +18,7 @@ const Features = () => (
       </div>
 
       <div className="grid gap-14 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-        <div className="flex max-w-sm flex-col items-center text-center">
+        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-blue-50 dark:bg-blue-950/30 p-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
             <FavoriteBorderIcon
               className="text-blue-600 dark:text-blue-300"
@@ -29,13 +28,13 @@ const Features = () => (
           <h3 className="mb-2 text-xl font-semibold dark:text-white">
             Professional Care
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             Connect with verified psychiatrists and mental-health professionals
             securely.
           </p>
         </div>
 
-        <div className="flex max-w-sm flex-col items-center text-center">
+        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-green-50 dark:bg-green-950/30 p-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
             <EmojiEmotionsIcon
               className="text-green-600 dark:text-green-300"
@@ -45,13 +44,13 @@ const Features = () => (
           <h3 className="mb-2 text-xl font-semibold dark:text-white">
             Paid Consultations
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             Book sessions, handle payments smoothly, and focus entirely on
             healing.
           </p>
         </div>
 
-        <div className="flex max-w-sm flex-col items-center text-center">
+        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-purple-50 dark:bg-purple-950/30 p-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
             <ForumIcon
               className="text-purple-600 dark:text-purple-300"
@@ -61,12 +60,12 @@ const Features = () => (
           <h3 className="mb-2 text-xl font-semibold dark:text-white">
             Community Support
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             Engage with a caring, moderated community that understands you.
           </p>
         </div>
 
-        <div className="flex max-w-sm flex-col items-center text-center">
+        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-teal-50 dark:bg-teal-950/30 p-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900">
             <AssistantIcon
               className="text-teal-600 dark:text-teal-300"
@@ -76,7 +75,7 @@ const Features = () => (
           <h3 className="mb-2 text-xl font-semibold dark:text-white">
             AI Personal Assistant
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             Smart scheduling, habit building, and hobby planning tailored to
             you.
           </p>
