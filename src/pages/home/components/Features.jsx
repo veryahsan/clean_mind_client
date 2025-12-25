@@ -1,85 +1,39 @@
 import React from "react";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import ForumIcon from "@mui/icons-material/Forum";
-import AssistantIcon from "@mui/icons-material/Assistant";
+import features from "../../../constants/features";
 
 const Features = () => (
   <section className="bg-white dark:bg-gray-900 py-20">
-    <div className="mx-auto max-w-screen-xl px-6 lg:px-8 text-center">
+    <div className="mx-auto max-w-screen-xl px-4 lg:px-8 text-center">
       <div className="mx-auto max-w-screen-md mb-16">
-        <h2 className="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        <h2 className="mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white">
           A Better Way to Care for Your Mental Health
         </h2>
-        <p className="text-lg text-gray-500 dark:text-gray-400">
+        <p className="text-base sm:text-lg md:text-xl text-gray-500 dark:text-gray-400">
           Get the support you need through trusted professionals, a
           compassionate community, and smart tools that adapt to your life.
         </p>
       </div>
 
-      <div className="grid gap-14 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-blue-50 dark:bg-blue-950/30 p-8">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-            <FavoriteBorderIcon
-              className="text-blue-600 dark:text-blue-300"
-              fontSize="large"
-            />
-          </div>
-          <h3 className="mb-2 text-xl font-semibold dark:text-white">
-            Professional Care
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Connect with verified psychiatrists and mental-health professionals
-            securely.
-          </p>
-        </div>
-
-        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-green-50 dark:bg-green-950/30 p-8">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-            <EmojiEmotionsIcon
-              className="text-green-600 dark:text-green-300"
-              fontSize="large"
-            />
-          </div>
-          <h3 className="mb-2 text-xl font-semibold dark:text-white">
-            Paid Consultations
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Book sessions, handle payments smoothly, and focus entirely on
-            healing.
-          </p>
-        </div>
-
-        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-purple-50 dark:bg-purple-950/30 p-8">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
-            <ForumIcon
-              className="text-purple-600 dark:text-purple-300"
-              fontSize="large"
-            />
-          </div>
-          <h3 className="mb-2 text-xl font-semibold dark:text-white">
-            Community Support
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Engage with a caring, moderated community that understands you.
-          </p>
-        </div>
-
-        <div className="flex max-w-sm flex-col items-center text-center rounded-2xl bg-teal-50 dark:bg-teal-950/30 p-8">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900">
-            <AssistantIcon
-              className="text-teal-600 dark:text-teal-300"
-              fontSize="large"
-            />
-          </div>
-          <h3 className="mb-2 text-xl font-semibold dark:text-white">
-            AI Personal Assistant
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Smart scheduling, habit building, and hobby planning tailored to
-            you.
-          </p>
-        </div>
+      <div className="grid gap-y-10 gap-x-14 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-stretch">
+        {features.map((feature, index) => {
+          const Icon = feature.icon;
+          return (
+            <div
+              key={index}
+              className={`flex flex-col items-center text-center rounded-2xl p-8 ${feature.bg} ${feature.hover} transition min-h-[250px] sm:min-h-[280px] md:min-h-[300px]`}
+            >
+              <div
+                className={`mb-5 flex h-14 w-14 items-center justify-center rounded-full ${feature.iconBg}`}
+              >
+                <Icon className={feature.color} fontSize="large" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold dark:text-white">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">{feature.desc}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   </section>

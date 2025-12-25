@@ -1,62 +1,139 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="p-4 bg-white md:p-8 lg:p-10 dark:bg-gray-800">
-      <div className="mx-auto max-w-screen-xl text-center">
-        {/* Brand */}
-        <a
-          href="#"
-          className="flex justify-center items-center text-2xl font-semibold text-gray-900 dark:text-white mb-4"
-        >
-          <svg
-            className="mr-2 h-8"
-            viewBox="0 0 33 33"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M25.2696 13.126C25.1955 13.6364 24.8589 14.3299 24.4728 14.9328C23.9856 15.6936 23.2125 16.2264 22.3276 16.4114L18.43 17.2265C17.8035 17.3575 17.2355 17.6853 16.8089 18.1621L14.2533 21.0188C13.773 21.5556 13.4373 21.4276 13.4373 20.7075C13.4315 20.7342 12.1689 23.9903 15.5149 25.9202C16.8005 26.6618 18.6511 26.3953 19.9367 25.6538L26.7486 21.7247C29.2961 20.2553 31.0948 17.7695 31.6926 14.892C31.7163 14.7781 31.7345 14.6639 31.7542 14.5498L25.2696 13.126Z"
-              fill="url(#paint0_linear_11430_22515)"
-            />
-            {/* ... Add remaining SVG paths or use a simpler logo */}
-          </svg>
-          Clean Mind
-        </a>
+    <footer className="w-full bg-white dark:bg-gray-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 gap-y-8 md:gap-8 py-10 max-w-sm mx-auto sm:max-w-3xl lg:max-w-full">
+          {/* Brand & Contact */}
+          <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0 text-center lg:text-left">
+            <a href="#" className="flex justify-center lg:justify-start mb-4">
+              <svg
+                className="w-40 h-8"
+                viewBox="0 0 164 33"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Your full SVG paths here */}
+              </svg>
+            </a>
+            <p className="py-4 text-sm text-gray-500">
+              Trusted in more than 100 countries & 5 million customers. Have any
+              query?
+            </p>
+            <a
+              href="#"
+              className="py-2.5 px-5 h-9 inline-block bg-indigo-600 rounded-full shadow-sm text-xs text-white transition-all duration-500 hover:bg-indigo-700"
+            >
+              Contact us
+            </a>
+          </div>
 
-        {/* Description */}
-        <p className="my-6 text-gray-500 dark:text-gray-400">
-          A community of the wonderful people from all around the globe. Join us to be a lovely member.
-        </p>
+          {/* Pages */}
+          <div className="text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">CleanMind</h4>
+            <ul className="text-sm">
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Home
+                </a>
+              </li>
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Pricing
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        {/* Footer Links */}
-        <ul className="flex flex-wrap justify-center items-center mb-6 text-gray-900 dark:text-white">
-          {[
-            "About",
-            "Premium",
-            "Campaigns",
-            "Blog",
-            "Affiliate Program",
-            "FAQs",
-            "Contact",
-          ].map((link, index) => (
-            <li key={index}>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                {link}
-              </a>
-            </li>
-          ))}
-        </ul>
+          {/* Products */}
+          <div className="text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">Products</h4>
+            <ul className="text-sm">
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Figma UI System
+                </a>
+              </li>
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Icons Assets
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Responsive Blocks
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        {/* Copyright */}
-        <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-          © 2025-2026{" "}
-          <a href="#" className="hover:underline">
-            Clean Mind™
-          </a>
-          . All Rights Reserved.
-        </span>
+          {/* Support */}
+          <div className="text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">Support</h4>
+            <ul className="text-sm">
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Customer Support
+                </a>
+              </li>
+              <li className="mb-6">
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Terms & Conditions
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-600 hover:text-gray-900">
+                  Privacy Policy
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Subscribe */}
+          <div className="text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">
+              Subscribe
+            </h4>
+            <p className="text-sm text-gray-500 leading-6 mb-7">
+              Subscribe to get the latest news from us
+            </p>
+            <a
+              href="#"
+              className="flex items-center justify-center gap-2 border border-blue-50 rounded-full py-3 px-6 w-fit text-sm text-indigo-600 font-semibold transition-all duration-500 hover:bg-indigo-50"
+            >
+              Subscribe
+              <svg
+                width="15"
+                height="12"
+                viewBox="0 0 15 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1.25 6L13.25 6M9.5 10.5L13.4697 6.53033C13.7197 6.28033 13.8447 6.15533 13.8447 6C13.8447 5.84467 13.7197 5.71967 13.4697 5.46967L9.5 1.5"
+                  stroke="#4F46E5"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom */}
+        <div className="py-7 border-t border-gray-200 flex flex-col lg:flex-row items-center justify-center lg:justify-between">
+          <span className="text-sm text-gray-500 mb-4 lg:mb-0">
+            © <a href="#">CleanMind</a> 2026, All rights reserved.
+          </span>
+        </div>
       </div>
     </footer>
   );
