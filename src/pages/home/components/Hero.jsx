@@ -1,7 +1,7 @@
 import React from "react";
 
 const Hero = () => (
-  <section className="bg-blue-50 dark:bg-gray-900 py-20 px-4 text-center">
+  <section className="bg-gradient-to-b from-blue-100 to-white dark:from-gray-800 dark:to-gray-950 py-20 px-4 text-center">
     <div className="mx-auto max-w-3xl">
       <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-6">
         Mental Health Matters

@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           <RouterLink
             to="/"
-            className="text-2xl font-bold text-gray-900 dark:text-white"
+            className="text-xl font-bold text-gray-900 dark:text-white"
           >
             Clean Mind
           </RouterLink>
