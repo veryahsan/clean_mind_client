@@ -94,7 +94,11 @@ const Register = () => {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
               disabled={loading}
+              placeholder="e.g. ahsanmehmood_"
             />
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+              Only letters, numbers, and @ . + - _ are allowed
+            </p>
             {errors.username && (
               <p className="text-red-600 text-sm mt-1">{errors.username}</p>
             )}
@@ -110,7 +114,11 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
               disabled={loading}
+              placeholder="example@email.com"
             />
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+              Enter a valid email address
+            </p>
             {errors.email && (
               <p className="text-red-600 text-sm mt-1">{errors.email}</p>
             )}
@@ -126,7 +134,11 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
               disabled={loading}
+              placeholder="At least 8 characters"
             />
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+              Must be at least 8 characters
+            </p>
             {errors.password && (
               <p className="text-red-600 text-sm mt-1">{errors.password}</p>
             )}
@@ -142,7 +154,11 @@ const Register = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
               disabled={loading}
+              placeholder="Repeat your password"
             />
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+              Must match the password above
+            </p>
             {errors.confirmPassword && (
               <p className="text-red-600 text-sm mt-1">
                 {errors.confirmPassword}
