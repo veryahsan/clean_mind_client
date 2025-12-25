@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const ModalContext = createContext();
 export const useModal = () => useContext(ModalContext);
@@ -21,21 +21,33 @@ export const ModalProvider = ({ children }) => {
     }, 300);
   };
 
+  useEffect(() => {
+    if (modalContent) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [modalContent]);
+
   return (
     <ModalContext.Provider value={{ openModal, closeModal }}>
       {children}
       {modalContent && (
         <div
-          className={`fixed inset-0 z-50 flex items-center justify-center bg-black/30 transition-opacity duration-300 ${
+          className={`fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/30 transition-opacity duration-300 ${
             isClosing ? "opacity-0" : "opacity-100"
           }`}
           onClick={closeModal}
         >
           <div
-            className={`bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full relative transform transition-transform duration-300 ${
+            className={`bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full relative transform transition-all duration-300 ${
               isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
             }`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // ✅ prevent close inside
           >
             {modalContent}
             <button

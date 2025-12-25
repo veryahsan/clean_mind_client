@@ -1,38 +1,39 @@
 import React from "react";
+import { useModal } from "../../context/ModalContext";
+import ContactModal from "../../modals/ContactModal";
 
 const Footer = () => {
+  const { openModal } = useModal();
+
   return (
     <footer className="w-full bg-white dark:bg-gray-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 gap-y-8 md:gap-8 py-10 max-w-sm mx-auto sm:max-w-3xl lg:max-w-full">
-          {/* Brand & Contact */}
           <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0 text-center lg:text-left">
-            <a href="#" className="flex justify-center lg:justify-start mb-4">
-              <svg
-                className="w-40 h-8"
-                viewBox="0 0 164 33"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Your full SVG paths here */}
-              </svg>
+            <a
+              href="#"
+              className="flex justify-center lg:justify-start mb-4 font-medium"
+            >
+              CleanMind
             </a>
+
             <p className="py-4 text-sm text-gray-500">
               Trusted in more than 100 countries & 5 million customers. Have any
               query?
             </p>
-            <a
-              href="#"
+
+            <button
+              onClick={() => openModal(<ContactModal />)}
               className="py-2.5 px-5 h-9 inline-block bg-indigo-600 rounded-full shadow-sm text-xs text-white transition-all duration-500 hover:bg-indigo-700"
             >
               Contact us
-            </a>
+            </button>
           </div>
 
-          {/* Pages */}
           <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">CleanMind</h4>
+            <h4 className="text-lg text-gray-900 font-medium mb-7">
+              CleanMind
+            </h4>
             <ul className="text-sm">
               <li className="mb-6">
                 <a href="#" className="text-gray-600 hover:text-gray-900">
@@ -52,9 +53,10 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Products */}
           <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">Follow Us</h4>
+            <h4 className="text-lg text-gray-900 font-medium mb-7">
+              Follow Us
+            </h4>
             <ul className="text-sm">
               <li className="mb-6">
                 <a href="#" className="text-gray-600 hover:text-gray-900">
@@ -74,7 +76,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Support */}
           <div className="text-left">
             <h4 className="text-lg text-gray-900 font-medium mb-7">Support</h4>
             <ul className="text-sm">
@@ -96,7 +97,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Subscribe */}
           <div className="text-left">
             <h4 className="text-lg text-gray-900 font-medium mb-7">
               Subscribe
@@ -128,7 +128,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom */}
         <div className="py-7 border-t border-gray-200 flex flex-col lg:flex-row items-center justify-center lg:justify-between">
           <span className="text-sm text-gray-500 mb-4 lg:mb-0">
             © <a href="#">CleanMind</a> 2026, All rights reserved.
