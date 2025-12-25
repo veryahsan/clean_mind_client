@@ -9,11 +9,11 @@ const Features = () => (
     <div className="mx-auto max-w-screen-xl px-6 lg:px-8 text-center">
       <div className="mx-auto max-w-screen-md mb-16">
         <h2 className="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-          Supporting Your Mental Well-Being
+          A Better Way to Care for Your Mental Health
         </h2>
         <p className="text-lg text-gray-500 dark:text-gray-400">
-          Professional care, community support, and intelligent tools — all in
-          one safe space.
+          Get the support you need through trusted professionals, a
+          compassionate community, and smart tools that adapt to your life.
         </p>
       </div>
 

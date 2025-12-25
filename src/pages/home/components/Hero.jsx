@@ -4,7 +4,7 @@ const Hero = () => (
   <section className="bg-gradient-to-b from-blue-100 to-white dark:from-gray-800 dark:to-gray-950 py-20 px-4 text-center">
     <div className="mx-auto max-w-3xl">
       <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-        Mental Health Matters
+        Care for Your Mind, When You Need It Most
       </h1>
       <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 mb-8">
         Your mind deserves the same care as your body. Start your journey
