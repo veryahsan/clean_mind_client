@@ -15,20 +15,20 @@ const ContactModal = () => {
         <div className="flex items-center gap-3">
           <Email className="text-indigo-600" />
           <a href="mailto:info@example.com" className="underline">
-            info@example.com
+            dev.ahsan.mehmood@gmail.com
           </a>
         </div>
 
         <div className="flex items-center gap-3">
           <Phone className="text-indigo-600" />
           <a href="tel:+1234567890" className="underline">
-            +1 234 567 890
+            +92 303 4658867
           </a>
         </div>
 
         <div className="flex items-center gap-3">
           <LocationOn className="text-indigo-600" />
-          <span>123 Main Street, City, Country</span>
+          <span>Model Town, Lahore, Pakistan</span>
         </div>
       </div>
 
