@@ -1,6 +1,7 @@
 import React from "react";
 import { useModal } from "../../context/ModalContext";
 import ContactModal from "../../modals/ContactModal";
+import Logo from "../../assets/logo.png";
 
 const Footer = () => {
   const { openModal } = useModal();
@@ -12,9 +13,9 @@ const Footer = () => {
           <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0 text-center lg:text-left">
             <a
               href="#"
-              className="flex justify-center lg:justify-start mb-4 font-medium"
+              className="flex justify-center lg:justify-start font-medium"
             >
-              CleanMind
+              <img src={Logo} alt="CleanMind Logo" className="h-24 w-auto" />
             </a>
 
             <p className="py-4 text-sm text-gray-500">

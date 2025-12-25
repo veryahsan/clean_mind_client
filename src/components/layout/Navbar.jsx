@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import UserAvatar from "../layout/UserAvatar";
+import Logo from "../../assets/logo.png";
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -28,11 +29,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <RouterLink
-            to="/"
-            className="text-xl font-bold text-gray-900 dark:text-white"
-          >
-            CleanMind
+          <RouterLink to="/" className="inline-flex items-center">
+            <img src={Logo} alt="CleanMind Logo" className="h-16 w-auto" />
+            <span className="text-2xl font-semibold font-sans text-gray-900 dark:text-white tracking-tight">
+              CleanMind
+            </span>
           </RouterLink>
 
           {/* Desktop Links */}
