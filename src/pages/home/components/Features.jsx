@@ -14,7 +14,7 @@ const Features = () => (
         </p>
       </div>
 
-      <div className="grid gap-y-10 gap-x-14 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-stretch">
+      <div className="grid gap-y-10 gap-x-6 sm:gap-x-8 md:gap-x-10 lg:gap-x-14 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-stretch">
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (

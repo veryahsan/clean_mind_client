@@ -82,7 +82,7 @@ const Navbar = () => {
                 </button>
 
                 {isNotificationOpen && (
-                  <div className="absolute right-0 mt-10 w-64 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="absolute right-0 mt-10 w-64 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
                       No new notifications
                     </div>
@@ -100,7 +100,7 @@ const Navbar = () => {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                       <div className="py-1">
                         <RouterLink
                           to="/profile"

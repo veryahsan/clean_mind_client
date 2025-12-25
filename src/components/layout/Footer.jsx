@@ -54,21 +54,21 @@ const Footer = () => {
 
           {/* Products */}
           <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">Products</h4>
+            <h4 className="text-lg text-gray-900 font-medium mb-7">Follow Us</h4>
             <ul className="text-sm">
               <li className="mb-6">
                 <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Figma UI System
+                  Instagram
                 </a>
               </li>
               <li className="mb-6">
                 <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Icons Assets
+                  Facebook
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Responsive Blocks
+                  Twitter
                 </a>
               </li>
             </ul>
