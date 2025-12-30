@@ -97,7 +97,12 @@ const Navbar = () => {
                     onClick={() => setIsProfileMenuOpen((prev) => !prev)}
                     className="flex rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <UserAvatar username={user?.username} />
+                    <UserAvatar 
+                      username={user?.username} 
+                      headshot={user?.headshot} 
+                      has_headshot={user?.has_headshot}
+                      size={40} 
+                    />
                   </button>
 
                   {isProfileMenuOpen && (

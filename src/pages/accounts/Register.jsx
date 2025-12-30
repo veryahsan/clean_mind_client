@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import api from "../../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import SuccessMessage from "../../components/common/SuccessMessage";
+import ErrorMessage from "../../components/common/ErrorMessage";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
@@ -10,6 +12,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -44,27 +47,62 @@ const Register = () => {
 
     setLoading(true);
     setErrors({});
+    setGeneralError("");
+    setSuccessMessage("");
     try {
-      await api.post("register/", {
+      const response = await api.post("register/", {
         username,
         email,
         password,
         password2: confirmPassword,
       });
 
-      setSuccessMessage("Registration successful! Redirecting to login...");
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      // Handle standardized response format
+      const responseData = response.data;
+      if (responseData.success) {
+        setSuccessMessage(responseData.message || "Registration successful! Redirecting to login...");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
 
-      setTimeout(() => {
-        setSuccessMessage("");
-        navigate("/login");
-      }, 2000);
+        setTimeout(() => {
+          setSuccessMessage("");
+          navigate("/login");
+        }, 2000);
+      }
     } catch (err) {
-      if (err.response?.data) setErrors(err.response.data);
-      else alert("Registration failed!");
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        
+        // Handle standardized error format
+        if (errorData.success === false) {
+          // Set general error message
+          if (errorData.message) {
+            setGeneralError(errorData.message);
+          }
+          
+          // Set field-specific errors
+          if (errorData.errors) {
+            setErrors(errorData.errors);
+          }
+        } else {
+          // Handle old format (backward compatibility)
+          if (errorData.non_field_errors) {
+            const errorMsg = Array.isArray(errorData.non_field_errors) 
+              ? errorData.non_field_errors[0] 
+              : errorData.non_field_errors;
+            setGeneralError(errorMsg);
+          } else {
+            setErrors(errorData);
+            if (errorData.detail) {
+              setGeneralError(errorData.detail);
+            }
+          }
+        }
+      } else {
+        setGeneralError("Registration failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -77,11 +115,12 @@ const Register = () => {
           Start your healthy routine
         </h2>
 
-        {successMessage && (
-          <div className="bg-green-500 text-white rounded-md px-4 py-2 mb-4 text-center">
-            {successMessage}
-          </div>
-        )}
+        <SuccessMessage 
+          message={successMessage} 
+          onDismiss={() => setSuccessMessage("")} 
+        />
+
+        <ErrorMessage message={generalError} />
 
         <form onSubmit={handleRegister} noValidate className="space-y-4">
           <div>

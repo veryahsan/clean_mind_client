@@ -8,6 +8,7 @@ import Login from "./pages/accounts/Login.jsx";
 import Register from "./pages/accounts/Register.jsx";
 import CreateSpecialist from "./pages/accounts/CreateSpecialist.jsx";
 import MemberDashboard from "./pages/dashboard/MemberDashboard.jsx";
+import Profile from "./pages/profile/Profile.jsx";
 import Footer from "./components/layout/Footer";
 
 const AppRoutes = () => {
@@ -33,6 +34,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <MemberDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         }
       />

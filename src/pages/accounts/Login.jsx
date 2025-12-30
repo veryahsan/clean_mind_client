@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import SuccessMessage from "../../components/common/SuccessMessage";
+import ErrorMessage from "../../components/common/ErrorMessage";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
@@ -43,14 +45,30 @@ const Login = () => {
     } else {
       // Handle errors from the context
       const errorData = result.error;
-      if (errorData.non_field_errors) {
-        setErrors({ ...errors, general: errorData.non_field_errors[0] || errorData.non_field_errors });
+      
+      // Handle standardized error format
+      if (errorData.message) {
+        setErrors({ general: errorData.message });
+      } else if (errorData.errors) {
+        // Field-specific errors from standardized format
+        const fieldErrors = {};
+        Object.keys(errorData.errors).forEach((key) => {
+          if (Array.isArray(errorData.errors[key])) {
+            fieldErrors[key] = errorData.errors[key][0];
+          } else {
+            fieldErrors[key] = errorData.errors[key];
+          }
+        });
+        setErrors(fieldErrors);
+      } else if (errorData.non_field_errors) {
+        // Old format (backward compatibility)
+        setErrors({ general: Array.isArray(errorData.non_field_errors) ? errorData.non_field_errors[0] : errorData.non_field_errors });
       } else if (errorData.username) {
         setErrors({ username: Array.isArray(errorData.username) ? errorData.username[0] : errorData.username });
       } else if (errorData.password) {
         setErrors({ password: Array.isArray(errorData.password) ? errorData.password[0] : errorData.password });
       } else {
-        setErrors({ general: "Login failed. Please try again." });
+        setErrors({ general: errorData.message || "Login failed. Please try again." });
       }
     }
 
@@ -64,17 +82,12 @@ const Login = () => {
           Sign in to your account
         </h2>
 
-        {successMessage && (
-          <div className="bg-green-500 text-white rounded-md px-4 py-2 mb-4">
-            {successMessage}
-          </div>
-        )}
+        <SuccessMessage 
+          message={successMessage} 
+          onDismiss={() => setSuccessMessage("")} 
+        />
 
-        {errors.general && (
-          <div className="bg-red-500 text-white rounded-md px-4 py-2 mb-4">
-            {errors.general}
-          </div>
-        )}
+        <ErrorMessage message={errors.general} />
 
         <form onSubmit={handleLogin} noValidate className="space-y-4">
           <div>
