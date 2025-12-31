@@ -38,10 +38,7 @@ const Login = () => {
       setSuccessMessage("Login successful!");
       setUsername("");
       setPassword("");
-
-      setTimeout(() => {
-        navigate("/member-dashboard");
-      }, 800);
+      navigate("/member-dashboard", { replace: true });
     } else {
       // Handle errors from the context
       const errorData = result.error;

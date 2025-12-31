@@ -28,23 +28,8 @@ const Footer = () => {
                 Security
               </a>
               <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Status
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
                 Community
               </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Docs
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Contact
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Manage cookies
-              </a>
-              <span className="text-gray-600 dark:text-gray-400">
-                Do not share my personal information
-              </span>
             </div>
           </div>
         </div>

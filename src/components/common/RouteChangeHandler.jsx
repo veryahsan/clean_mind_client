@@ -16,11 +16,14 @@ const RouteChangeHandler = () => {
     }
 
     if (prevPathnameRef.current !== location.pathname) {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "instant",
-      });
+      // Use smooth scroll for better UX, but with a small delay to prevent stutter
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "smooth",
+        });
+      }, 50);
 
       if (modalContent) {
         closeModal();
