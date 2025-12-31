@@ -8,33 +8,9 @@ const Footer = () => {
   const { openModal } = useModal();
   const { isAuthenticated } = useAuth();
 
-  // Minimal footer for authenticated users
+  // No footer for authenticated users (moved to sidebar)
   if (isAuthenticated) {
-    return (
-      <footer className="w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              © 2026 CleanMind, Inc.
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Terms
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Privacy
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Security
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
-                Community
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    );
+    return null;
   }
 
   // Full footer for non-authenticated users

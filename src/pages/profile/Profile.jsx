@@ -105,6 +105,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-white p-6">
+      <div className="max-w-7xl mx-auto">
           <SuccessMessage 
             message={successMessage} 
             onDismiss={() => setSuccessMessage(null)} 
@@ -286,6 +287,7 @@ const Profile = () => {
               )}
             </div>
           </form>
+      </div>
     </div>
   );
 };

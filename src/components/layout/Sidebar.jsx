@@ -5,6 +5,7 @@ import { useModal } from "../../context/ModalContext";
 import UserAvatar from "../layout/UserAvatar";
 import Logo from "../../assets/logo.png";
 import LogoutModal from "../../modals/LogoutModal";
+import AuthenticatedFooter from "./AuthenticatedFooter";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -220,7 +221,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {/* End Header */}
 
           {/* Body */}
-          <nav className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+          <nav className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             <div className="pb-0 px-2 w-full flex flex-col flex-wrap">
               <ul className="space-y-1">
                 {menuItems.map((item) => {
@@ -338,6 +339,9 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
           </nav>
           {/* End Body */}
+
+          {/* Footer at bottom of sidebar */}
+          <AuthenticatedFooter className="mt-auto" />
         </div>
       </div>
       {/* End Sidebar */}
