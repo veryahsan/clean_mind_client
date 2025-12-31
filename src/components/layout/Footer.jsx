@@ -1,10 +1,58 @@
 import React from "react";
 import { useModal } from "../../context/ModalContext";
+import { useAuth } from "../../context/AuthContext";
 import ContactModal from "../../modals/ContactModal";
 import Logo from "../../assets/logo.png";
 
 const Footer = () => {
   const { openModal } = useModal();
+  const { isAuthenticated } = useAuth();
+
+  // Minimal footer for authenticated users
+  if (isAuthenticated) {
+    return (
+      <footer className="w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              © 2026 CleanMind, Inc.
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Terms
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Privacy
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Security
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Status
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Community
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Docs
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Contact
+              </a>
+              <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition">
+                Manage cookies
+              </a>
+              <span className="text-gray-600 dark:text-gray-400">
+                Do not share my personal information
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // Full footer for non-authenticated users
 
   return (
     <footer className="w-full bg-white dark:bg-gray-800">
