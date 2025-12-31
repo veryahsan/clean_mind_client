@@ -1,20 +1,15 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import Loader from "../common/Loader";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    // Show loading spinner while checking authentication
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-300">Loading...</div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!isAuthenticated) {
-    // Redirect to login if not authenticated
     return <Navigate to="/login" replace />;
   }
 
@@ -22,5 +17,6 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default ProtectedRoute;
+
 
 

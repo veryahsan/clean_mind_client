@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 const ModalContext = createContext();
 export const useModal = () => useContext(ModalContext);
@@ -8,18 +8,18 @@ export const ModalProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
   const [isClosing, setIsClosing] = useState(false);
 
-  const openModal = (content) => {
+  const openModal = useCallback((content) => {
     setModalContent(content);
     setIsClosing(false);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       setModalContent(null);
       setIsClosing(false);
     }, 300);
-  };
+  }, []);
 
   useEffect(() => {
     if (modalContent) {
@@ -34,7 +34,7 @@ export const ModalProvider = ({ children }) => {
   }, [modalContent]);
 
   return (
-    <ModalContext.Provider value={{ openModal, closeModal }}>
+    <ModalContext.Provider value={{ openModal, closeModal, modalContent }}>
       {children}
       {modalContent && (
         <div

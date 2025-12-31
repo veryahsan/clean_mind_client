@@ -76,11 +76,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-md shadow-md w-full max-w-md p-4 sm:p-6 md:p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 sm:p-8 md:p-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
           Sign in to your account
         </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+          Welcome back! Please enter your credentials.
+        </p>
 
         <SuccessMessage 
           message={successMessage} 
@@ -89,42 +92,44 @@ const Login = () => {
 
         <ErrorMessage message={errors.general} />
 
-        <form onSubmit={handleLogin} noValidate className="space-y-4">
+        <form onSubmit={handleLogin} noValidate className="space-y-5">
           <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               Username
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
               disabled={loading}
+              placeholder="Enter your username"
             />
             {errors.username && (
-              <p className="text-red-600 text-sm mt-1">{errors.username}</p>
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">{errors.username}</p>
             )}
           </div>
 
           <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
               disabled={loading}
+              placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">{errors.password}</p>
             )}
           </div>
 
           <button
             type="submit"
-            className={`w-full flex justify-center items-center gap-2 bg-primary hover:bg-primaryHover text-white py-2 rounded-md font-medium transition ${
+            className={`w-full flex justify-center items-center gap-2 bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
             disabled={loading}
@@ -134,14 +139,14 @@ const Login = () => {
                 <CircularProgress size={20} color="inherit" />
               </Box>
             )}
-            Login
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 dark:text-gray-300 mt-4 text-sm">
+        <p className="text-center text-gray-600 dark:text-gray-400 mt-6 text-sm">
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary hover:underline">
-            Register
+          <Link to="/register" className="text-primary hover:text-primaryHover font-medium hover:underline transition">
+            Create one
           </Link>
         </p>
       </div>

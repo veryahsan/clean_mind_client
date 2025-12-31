@@ -10,6 +10,7 @@ import CreateSpecialist from "./pages/accounts/CreateSpecialist.jsx";
 import MemberDashboard from "./pages/dashboard/MemberDashboard.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Footer from "./components/layout/Footer";
+import RouteChangeHandler from "./components/common/RouteChangeHandler";
 
 const AppRoutes = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -52,6 +53,7 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <AuthProvider>
+      <RouteChangeHandler />
       <Navbar />
       <AppRoutes />
       <Footer />

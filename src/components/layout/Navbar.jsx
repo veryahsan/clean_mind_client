@@ -1,21 +1,27 @@
 import React, { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useModal } from "../../context/ModalContext";
 import UserAvatar from "../layout/UserAvatar";
 import Logo from "../../assets/logo.png";
+import LogoutModal from "../../modals/LogoutModal";
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { openModal } = useModal();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const logoutHandler = () => {
+  const handleLogoutConfirm = () => {
     logout();
+    window.location.href = "/login";
+  };
+
+  const handleLogoutClick = () => {
     setIsProfileMenuOpen(false);
     setIsNotificationOpen(false);
-    navigate("/");
+    openModal(<LogoutModal onConfirm={handleLogoutConfirm} />);
   };
 
   const navLinks = [
@@ -110,18 +116,20 @@ const Navbar = () => {
                       <div className="py-1">
                         <RouterLink
                           to="/profile"
+                          onClick={() => setIsProfileMenuOpen(false)}
                           className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           Your Profile
                         </RouterLink>
                         <RouterLink
                           to="/settings"
+                          onClick={() => setIsProfileMenuOpen(false)}
                           className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           Settings
                         </RouterLink>
                         <button
-                          onClick={logoutHandler}
+                          onClick={handleLogoutClick}
                           className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           Sign out
@@ -186,6 +194,7 @@ const Navbar = () => {
                 <RouterLink
                   key={link.name}
                   to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-md text-base font-medium bg-green-600 hover:bg-green-700 text-white transition"
                 >
                   {link.name}
@@ -194,6 +203,7 @@ const Navbar = () => {
                 <RouterLink
                   key={link.name}
                   to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 dark:text-gray-200 hover:text-primary transition"
                 >
                   {link.name}
@@ -203,25 +213,30 @@ const Navbar = () => {
           ) : (
             <>
               <button
-                onClick={() => setIsNotificationOpen((prev) => !prev)}
+                onClick={() => {
+                  setIsNotificationOpen((prev) => !prev);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-500 hover:text-blue-600"
               >
                 Notifications
               </button>
               <RouterLink
                 to="/profile"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Your Profile
               </RouterLink>
               <RouterLink
                 to="/settings"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Settings
               </RouterLink>
               <button
-                onClick={logoutHandler}
+                onClick={handleLogoutClick}
                 className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Sign out
