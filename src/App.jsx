@@ -116,7 +116,7 @@ const AppContent = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div
         className={`min-h-screen transition-all duration-300 ease-in-out ${
-          isAuthenticated ? "lg:ml-64" : ""
+          isAuthenticated ? "lg:ml-64 bg-white" : ""
         }`}
       >
         <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

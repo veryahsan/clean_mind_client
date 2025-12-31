@@ -104,13 +104,7 @@ const Profile = () => {
   const displayHeadshot = previewUrl || (hasHeadshot && profileData?.headshot ? getMediaUrl(profileData.headshot) : null);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-          Your Profile
-        </h1>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 md:p-8">
+    <div className="min-h-screen bg-white p-6">
           <SuccessMessage 
             message={successMessage} 
             onDismiss={() => setSuccessMessage(null)} 
@@ -128,7 +122,7 @@ const Profile = () => {
                   src={displayHeadshot}
                   alt={previewUrl ? "Preview" : `${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim() || profileData?.username}
                   sx={{ width: 120, height: 120 }}
-                  className="border-4 border-gray-200 dark:border-gray-700"
+                  className="border-4 border-gray-200"
                 />
               ) : (
                 <div className="w-30 h-30">
@@ -142,15 +136,15 @@ const Profile = () => {
               )}
             </div>
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                 {profileData?.first_name || profileData?.last_name
                   ? `${profileData.first_name || ""} ${profileData.last_name || ""}`.trim()
                   : profileData?.username}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-gray-600 mb-1">
                 @{profileData?.username}
               </p>
-              <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+              <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
                 {profileData?.role === "specialist" ? "Medical Specialist" : "Member"}
               </span>
             </div>
@@ -161,74 +155,74 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Username */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Username
                 </label>
                 <input
                   type="text"
                   value={profileData?.username || ""}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Username cannot be changed
                 </p>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
                   placeholder="Enter your email"
                 />
               </div>
 
               {/* First Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   First Name
                 </label>
                 <input
                   type="text"
                   value={formData.first_name}
                   onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
                   placeholder="Enter your first name"
                 />
               </div>
 
               {/* Last Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Last Name
                 </label>
                 <input
                   type="text"
                   value={formData.last_name}
                   onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
                   placeholder="Enter your last name"
                 />
               </div>
 
               {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Role
                 </label>
                 <input
                   type="text"
                   value={profileData?.role === "specialist" ? "Medical Specialist" : "Member"}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Role cannot be changed
                 </p>
               </div>
@@ -236,7 +230,7 @@ const Profile = () => {
 
             {/* Profile Picture Upload Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Profile Picture
               </label>
               <div className="flex items-center space-x-4">
@@ -244,11 +238,11 @@ const Profile = () => {
                   <img
                     src={displayHeadshot}
                     alt={previewUrl ? "Preview" : "Profile"}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-gray-500 dark:text-gray-400 text-sm">No image</span>
+                  <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">No image</span>
                   </div>
                 )}
                 <div className="flex-1">
@@ -258,9 +252,9 @@ const Profile = () => {
                     accept="image/*"
                     onChange={handleFileChange}
                     disabled={isSubmitting}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     Upload a new profile picture (JPG, PNG, etc. - Max 5MB)
                   </p>
                 </div>
@@ -268,7 +262,7 @@ const Profile = () => {
             </div>
 
             {/* Update Button */}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -285,15 +279,13 @@ const Profile = () => {
                 <button
                   type="button"
                   onClick={clearFile}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
                 >
                   Cancel file selection
                 </button>
               )}
             </div>
           </form>
-        </div>
-      </div>
     </div>
   );
 };
