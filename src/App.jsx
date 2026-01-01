@@ -95,6 +95,13 @@ const AppContent = () => {
     }
     return false;
   });
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedWidth = localStorage.getItem("sidebar-width");
+      return savedWidth ? parseInt(savedWidth, 10) : 256; // Default to w-64 (256px)
+    }
+    return 256;
+  });
 
   // Update sidebar state when authentication changes with smooth transition
   useEffect(() => {
@@ -112,12 +119,18 @@ const AppContent = () => {
 
   return (
     <>
-      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} sidebarWidth={sidebarWidth} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        sidebarWidth={sidebarWidth}
+        setSidebarWidth={setSidebarWidth}
+      />
       <div
-        className={`min-h-screen transition-all duration-300 ease-in-out ${
-          isAuthenticated ? "lg:ml-64 bg-white" : ""
+        className={`min-h-screen ${
+          isAuthenticated ? "bg-white transition-[margin-left] duration-300 ease-in-out" : ""
         }`}
+        style={isAuthenticated ? { marginLeft: `${sidebarWidth}px` } : {}}
       >
         <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <Footer />

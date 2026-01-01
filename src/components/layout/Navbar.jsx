@@ -5,8 +5,9 @@ import { useModal } from "../../context/ModalContext";
 import UserAvatar from "../layout/UserAvatar";
 import Logo from "../../assets/logo.png";
 import LogoutModal from "../../modals/LogoutModal";
+import DailyQuoteCapsule from "../common/DailyQuoteCapsule";
 
-const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
+const Navbar = ({ sidebarOpen, setSidebarOpen, sidebarWidth = 256 }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useModal();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -31,27 +32,37 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
   ];
 
   return (
-    <nav className={`sticky top-0 z-50 backdrop-blur-xl bg-white/20 dark:bg-gray-900/20 border-b border-white/10 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-in-out ${
-      isAuthenticated ? "lg:ml-64" : ""
-    }`}>
+    <nav 
+      className={`sticky top-0 z-50 backdrop-blur-xl bg-white/20 dark:bg-gray-900/20 border-b border-white/10 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-in-out`}
+      style={isAuthenticated ? { marginLeft: `${sidebarWidth}px` } : {}}
+    >
       <div className={`${isAuthenticated ? "w-full" : "max-w-7xl mx-auto"} px-4 sm:px-6 lg:px-8`}>
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo - Show with text when NOT authenticated, logo only on mobile when authenticated */}
-          {!isAuthenticated ? (
-            <RouterLink to="/" className="inline-flex items-center">
-              <img src={Logo} alt="CleanMind Logo" className="h-16 w-auto" />
-              <span className="text-2xl font-semibold font-sans text-gray-900 dark:text-white tracking-tight">
-                CleanMind
-              </span>
-            </RouterLink>
-          ) : (
-            <RouterLink to="/member-dashboard" className="lg:hidden inline-flex items-center">
-              <img src={Logo} alt="CleanMind Logo" className="h-12 w-auto" />
-            </RouterLink>
-          )}
+        <div className="flex justify-between h-16 items-center gap-4">
+          {/* Left Side - Logo and Quote */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Logo - Show with text when NOT authenticated, logo only on mobile when authenticated */}
+            {!isAuthenticated ? (
+              <RouterLink to="/" className="inline-flex items-center flex-shrink-0">
+                <img src={Logo} alt="CleanMind Logo" className="h-16 w-auto" />
+                <span className="text-2xl font-semibold font-sans text-gray-900 dark:text-white tracking-tight">
+                  CleanMind
+                </span>
+              </RouterLink>
+            ) : (
+              <>
+                <RouterLink to="/member-dashboard" className="lg:hidden inline-flex items-center flex-shrink-0">
+                  <img src={Logo} alt="CleanMind Logo" className="h-12 w-auto" />
+                </RouterLink>
+                {/* Daily Quote Capsule - Left side for authenticated users (only on desktop) */}
+                <div className="hidden lg:block flex-1 min-w-0 max-w-2xl">
+                  <DailyQuoteCapsule maxWidth="100%" />
+                </div>
+              </>
+            )}
+          </div>
 
-          {/* Desktop Links */}
-          <div className={`hidden md:flex space-x-4 items-center ${isAuthenticated ? "ml-auto" : ""}`}>
+          {/* Right Side - Desktop Links */}
+          <div className="hidden md:flex space-x-4 items-center flex-shrink-0">
             {!isAuthenticated ? (
               navLinks.map((link) =>
                 link.isButton ? (

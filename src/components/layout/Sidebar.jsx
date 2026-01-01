@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useModal } from "../../context/ModalContext";
@@ -7,11 +7,19 @@ import Logo from "../../assets/logo.png";
 import LogoutModal from "../../modals/LogoutModal";
 import AuthenticatedFooter from "./AuthenticatedFooter";
 
-const Sidebar = ({ isOpen, onClose }) => {
+const SIDEBAR_WIDTH_KEY = "sidebar-width";
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 500;
+const DEFAULT_SIDEBAR_WIDTH = 256; // w-64 = 256px
+
+const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useModal();
   const [expandedItems, setExpandedItems] = useState({});
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef(null);
+  const resizeHandleRef = useRef(null);
 
   const handleLogoutConfirm = () => {
     logout();
@@ -24,6 +32,58 @@ const Sidebar = ({ isOpen, onClose }) => {
     onClose();
     openModal(<LogoutModal onConfirm={handleLogoutConfirm} />);
   };
+
+  // Initialize sidebar width from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined" && !sidebarWidth) {
+      const savedWidth = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+      if (savedWidth) {
+        setSidebarWidth(parseInt(savedWidth, 10));
+      } else {
+        setSidebarWidth(DEFAULT_SIDEBAR_WIDTH);
+      }
+    }
+  }, [sidebarWidth, setSidebarWidth]);
+
+  // Handle mouse down on resize handle
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+  }, []);
+
+  // Handle mouse move for resizing
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+
+      const newWidth = e.clientX;
+      const clampedWidth = Math.max(
+        MIN_SIDEBAR_WIDTH,
+        Math.min(MAX_SIDEBAR_WIDTH, newWidth)
+      );
+      setSidebarWidth(clampedWidth);
+      localStorage.setItem(SIDEBAR_WIDTH_KEY, clampedWidth.toString());
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, [isResizing, setSidebarWidth]);
 
   // Only show sidebar when authenticated
   if (!isAuthenticated) return null;
@@ -172,9 +232,13 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <div
         id="hs-sidebar-content-push"
+        ref={sidebarRef}
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transition-all duration-300 ease-in-out transform h-full fixed top-0 start-0 bottom-0 z-50 bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 w-64`}
+        } lg:translate-x-0 transform h-full fixed top-0 start-0 bottom-0 z-50 bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 ${
+          isResizing ? "" : "transition-all duration-300 ease-in-out"
+        }`}
+        style={{ width: `${sidebarWidth || DEFAULT_SIDEBAR_WIDTH}px` }}
         role="dialog"
         tabIndex="-1"
         aria-label="Sidebar"
@@ -342,6 +406,31 @@ const Sidebar = ({ isOpen, onClose }) => {
 
           {/* Footer at bottom of sidebar */}
           <AuthenticatedFooter className="mt-auto" />
+        </div>
+
+        {/* Resize Handle */}
+        <div
+          ref={resizeHandleRef}
+          onMouseDown={handleMouseDown}
+          className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 w-3 h-12 cursor-col-resize rounded-md transition-all duration-200 group ${
+            isResizing 
+              ? "bg-indigo-500 scale-110" 
+              : "bg-gray-300 dark:bg-gray-600 hover:bg-indigo-400 dark:hover:bg-indigo-500 hover:scale-105"
+          }`}
+          style={{ 
+            zIndex: 60,
+            touchAction: "none"
+          }}
+          aria-label="Resize sidebar"
+        >
+          {/* Visual indicator dots */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-60 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="flex flex-col gap-1">
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
+            </div>
+          </div>
         </div>
       </div>
       {/* End Sidebar */}

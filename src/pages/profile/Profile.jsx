@@ -104,7 +104,7 @@ const Profile = () => {
   const displayHeadshot = previewUrl || (hasHeadshot && profileData?.headshot ? getMediaUrl(profileData.headshot) : null);
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="bg-white p-6">
       <div className="max-w-7xl mx-auto">
           <SuccessMessage 
             message={successMessage} 
