@@ -47,7 +47,7 @@ export const ModalProvider = ({ children }) => {
             className={`bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full relative transform transition-all duration-300 ${
               isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
             }`}
-            onClick={(e) => e.stopPropagation()} // ✅ prevent close inside
+            onClick={(e) => e.stopPropagation()}
           >
             {modalContent}
             <button
