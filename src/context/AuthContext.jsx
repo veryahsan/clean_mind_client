@@ -100,7 +100,6 @@ export const AuthProvider = ({ children }) => {
         access = responseData.data.access;
         refresh = responseData.data.refresh;
       } else if (responseData.access) {
-        // Fallback for old format (backward compatibility)
         access = responseData.access;
         refresh = responseData.refresh;
       }
