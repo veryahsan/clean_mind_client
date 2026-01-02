@@ -18,6 +18,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const { openModal } = useModal();
   const [expandedItems, setExpandedItems] = useState({});
   const [isResizing, setIsResizing] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const sidebarRef = useRef(null);
   const resizeHandleRef = useRef(null);
 
@@ -32,6 +33,17 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     onClose();
     openModal(<LogoutModal onConfirm={handleLogoutConfirm} />);
   };
+
+  // Check if we're on desktop
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   // Initialize sidebar width from localStorage
   useEffect(() => {
@@ -235,10 +247,12 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
         ref={sidebarRef}
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transform h-full fixed top-0 start-0 bottom-0 z-50 bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 ${
+        } lg:translate-x-0 transform h-full fixed top-0 start-0 bottom-0 z-50 bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 w-64 ${
           isResizing ? "" : "transition-all duration-300 ease-in-out"
         }`}
-        style={{ width: `${sidebarWidth || DEFAULT_SIDEBAR_WIDTH}px` }}
+        style={{ 
+          width: isDesktop ? `${sidebarWidth || DEFAULT_SIDEBAR_WIDTH}px` : undefined 
+        }}
         role="dialog"
         tabIndex="-1"
         aria-label="Sidebar"

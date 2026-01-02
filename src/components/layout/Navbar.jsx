@@ -7,7 +7,7 @@ import Logo from "../../assets/logo.png";
 import LogoutModal from "../../modals/LogoutModal";
 import DailyQuoteCapsule from "../common/DailyQuoteCapsule";
 
-const Navbar = ({ sidebarOpen, setSidebarOpen, sidebarWidth = 256 }) => {
+const Navbar = ({ sidebarOpen, setSidebarOpen, sidebarWidth = 256, isDesktop = false }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useModal();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -33,8 +33,10 @@ const Navbar = ({ sidebarOpen, setSidebarOpen, sidebarWidth = 256 }) => {
 
   return (
     <nav 
-      className={`sticky top-0 z-50 backdrop-blur-xl bg-white/20 dark:bg-gray-900/20 border-b border-white/10 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-in-out`}
-      style={isAuthenticated ? { marginLeft: `${sidebarWidth}px` } : {}}
+      className={`sticky top-0 z-50 backdrop-blur-xl bg-white/20 dark:bg-gray-900/20 border-b border-white/10 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-in-out ${
+        isAuthenticated ? "lg:ml-64" : ""
+      }`}
+      style={isAuthenticated && isDesktop ? { marginLeft: `${sidebarWidth}px` } : {}}
     >
       <div className={`${isAuthenticated ? "w-full" : "max-w-7xl mx-auto"} px-4 sm:px-6 lg:px-8`}>
         <div className="flex justify-between h-16 items-center gap-4">

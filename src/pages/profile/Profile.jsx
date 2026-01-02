@@ -287,7 +287,7 @@ const Profile = () => {
 
 
             {/* Update Button */}
-            <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+            <div className=" flex items-center justify-between">
               <button
                 type="submit"
                 disabled={isSubmitting}

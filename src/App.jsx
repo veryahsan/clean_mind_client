@@ -102,6 +102,23 @@ const AppContent = () => {
     }
     return 256;
   });
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024;
+    }
+    return false;
+  });
+
+  // Check if we're on desktop
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   // Update sidebar state when authentication changes with smooth transition
   useEffect(() => {
@@ -119,7 +136,7 @@ const AppContent = () => {
 
   return (
     <>
-      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} sidebarWidth={sidebarWidth} />
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} sidebarWidth={sidebarWidth} isDesktop={isDesktop} />
       <Sidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
@@ -128,9 +145,9 @@ const AppContent = () => {
       />
       <div
         className={`min-h-screen ${
-          isAuthenticated ? "bg-white transition-[margin-left] duration-300 ease-in-out" : ""
+          isAuthenticated ? "bg-white lg:ml-64 transition-[margin-left] duration-300 ease-in-out" : ""
         }`}
-        style={isAuthenticated ? { marginLeft: `${sidebarWidth}px` } : {}}
+        style={isAuthenticated && isDesktop ? { marginLeft: `${sidebarWidth}px` } : {}}
       >
         <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <Footer />
