@@ -135,11 +135,17 @@ export const AuthProvider = ({ children }) => {
       
       // Handle standardized error format
       if (errorData && errorData.success === false) {
+        // Extract non_field_errors to top level for easier access
+        const nonFieldErrors = errorData.errors?.non_field_errors || errorData.non_field_errors;
+        
         return {
           success: false,
           error: {
             message: errorData.message,
+            non_field_errors: nonFieldErrors,
             ...errorData.errors,
+            // Also include email at top level if present (for verification redirect)
+            email: errorData.email || (errorData.errors && errorData.errors.email),
           },
         };
       }

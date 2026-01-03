@@ -7,6 +7,8 @@ import Sidebar from "./components/layout/Sidebar";
 import Home from "./pages/home/Home";
 import Login from "./pages/accounts/Login.jsx";
 import Register from "./pages/accounts/Register.jsx";
+import VerifyEmail from "./pages/accounts/VerifyEmail.jsx";
+import VerifyCode from "./pages/accounts/VerifyCode.jsx";
 import CreateSpecialist from "./pages/accounts/CreateSpecialist.jsx";
 import MemberDashboard from "./pages/dashboard/MemberDashboard.jsx";
 import Calendar from "./pages/calendar/Calendar.jsx";
@@ -34,6 +36,8 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify-code" element={<VerifyCode />} />
+      <Route path="/verify-email/:token" element={<VerifyEmail />} />
       <Route path="/create-specialist" element={<CreateSpecialist />} />
       <Route
         path="/member-dashboard"

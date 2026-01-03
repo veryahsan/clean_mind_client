@@ -60,16 +60,17 @@ const Register = () => {
       // Handle standardized response format
       const responseData = response.data;
       if (responseData.success) {
-        setSuccessMessage(responseData.message || "Registration successful! Redirecting to login...");
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-
-        setTimeout(() => {
-          setSuccessMessage("");
-          navigate("/login");
-        }, 2000);
+        // Get verification token from response
+        const verificationToken = responseData.data?.verification_token;
+        const userEmail = responseData.data?.email || email;
+        
+        // Redirect to verification page with token
+        navigate("/verify-code", {
+          state: {
+            verification_token: verificationToken,
+            email: userEmail,
+          },
+        });
       }
     } catch (err) {
       if (err.response?.data) {
