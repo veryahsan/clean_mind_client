@@ -43,3 +43,4 @@ export const getBackendMediaUrl = (mediaPath) => {
   return `${backendUrl}${path}`;
 };
 
+

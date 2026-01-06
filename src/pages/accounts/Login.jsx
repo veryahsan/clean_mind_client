@@ -60,7 +60,7 @@ const Login = () => {
         // Get user email from error response if available
         const userEmail = errorData.email || errorData.errors?.email || "";
         
-        // Redirect to verification code page
+        // Redirect to "check your email" verification info page
         navigate("/verify-code", {
           state: {
             email: userEmail,

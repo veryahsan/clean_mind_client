@@ -60,15 +60,13 @@ const Register = () => {
       // Handle standardized response format
       const responseData = response.data;
       if (responseData.success) {
-        // Get verification token from response
-        const verificationToken = responseData.data?.verification_token;
         const userEmail = responseData.data?.email || email;
-        
-        // Redirect to verification page with token
+
+        // Redirect to "check your email" verification info page
         navigate("/verify-code", {
           state: {
-            verification_token: verificationToken,
             email: userEmail,
+            fromRegistration: true,
           },
         });
       }

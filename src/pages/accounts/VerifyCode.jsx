@@ -9,72 +9,26 @@ import Box from "@mui/material/Box";
 const VerifyCode = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
 
-  // Get token and email from location state (passed from registration or login)
+  // Get email and context from location state (passed from registration or login)
   useEffect(() => {
-    if (location.state?.verification_token) {
-      setVerificationCode(location.state.verification_token);
-    }
     if (location.state?.email) {
       setEmail(location.state.email);
     }
     
-    // Show message if coming from login
+    // Contextual info message
     if (location.state?.fromLogin) {
-      setMessage("Please verify your email address to activate your account. Enter the verification code sent to your email.");
-      setTimeout(() => setMessage(""), 5000);
+      setMessage("Your email is not verified. We have sent you a verification link. Please check your email and click the link to activate your account.");
+    } else if (location.state?.fromRegistration) {
+      setMessage("We have sent you a verification link. Please check your email and click the link to activate your account.");
+    } else {
+      setMessage("Please check your email for a verification link and click it to activate your account.");
     }
   }, [location.state]);
-
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    
-    if (!verificationCode.trim()) {
-      setError("Please enter the verification code");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setSuccess(false);
-
-    try {
-      const response = await api.get(`verify-email/${verificationCode.trim()}/`);
-      const responseData = response.data;
-
-      // Handle standardized response format
-      if (responseData.success) {
-        setSuccess(true);
-        setMessage(responseData.message || "Email verified successfully!");
-        
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate("/login", { replace: true });
-        }, 2000);
-      } else {
-        setError(responseData.message || "Verification failed");
-      }
-    } catch (err) {
-      const errorData = err.response?.data;
-      
-      // Handle standardized error format
-      if (errorData && errorData.success === false) {
-        setError(errorData.message || "Verification failed");
-      } else if (errorData?.message) {
-        setError(errorData.message);
-      } else {
-        setError("An error occurred during verification. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleResend = async () => {
     if (!email) {
@@ -91,9 +45,6 @@ const VerifyCode = () => {
 
       if (responseData.success) {
         setMessage(responseData.message || "Verification email sent successfully!");
-        if (responseData.data?.verification_token) {
-          setVerificationCode(responseData.data.verification_token);
-        }
         setTimeout(() => setMessage(""), 3000);
       } else {
         setError(responseData.message || "Failed to send verification email");
@@ -129,58 +80,27 @@ const VerifyCode = () => {
             Verify Your Email
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {email ? `We sent a verification code to ${email}` : "Enter the verification code sent to your email"}
+            {email
+              ? `We sent a verification link to ${email}. Please click the link in your email to verify your account.`
+              : "We sent you a verification link. Please check your email and click the link to activate your account."}
           </p>
         </div>
 
         <SuccessMessage message={message} onDismiss={() => setMessage("")} />
         <ErrorMessage message={error} />
 
-        {success ? (
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-8 h-8 text-green-600 dark:text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{message}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Redirecting to login...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleVerify} className="space-y-4">
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                Verification Code
-              </label>
-              <input
-                type="text"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition text-center font-mono text-lg"
-                placeholder="Enter verification code"
-                disabled={loading}
-                autoFocus
-              />
-              <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5 text-center">
-                Check your email for the verification code
-              </p>
-            </div>
+        <div className="space-y-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm text-center">
+            Open your email inbox and click the verification link we sent to complete your registration.
+          </p>
 
+          {email && (
             <button
-              type="submit"
-              disabled={loading || !verificationCode.trim()}
+              type="button"
+              onClick={handleResend}
+              disabled={loading}
               className={`w-full flex justify-center items-center gap-2 bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                loading || !verificationCode.trim() ? "opacity-70 cursor-not-allowed" : ""
+                loading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
               {loading && (
@@ -188,21 +108,18 @@ const VerifyCode = () => {
                   <CircularProgress size={20} color="inherit" />
                 </Box>
               )}
-              {loading ? "Verifying..." : "Verify Email"}
+              {loading ? "Sending..." : "Resend verification email"}
             </button>
+          )}
 
-            {email && (
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={loading}
-                className="w-full text-sm text-primary hover:text-primaryHover font-medium hover:underline transition"
-              >
-                Resend verification code
-              </button>
-            )}
-          </form>
-        )}
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="w-full text-sm text-primary hover:text-primaryHover font-medium hover:underline transition"
+          >
+            Back to login
+          </button>
+        </div>
       </div>
     </div>
   );
