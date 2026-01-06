@@ -115,7 +115,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     {
       id: "dashboard",
       name: "Dashboard",
-      path: "/member-dashboard",
+      path: "/dashboard",
       icon: (
         <svg
           className="size-4"
@@ -261,7 +261,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           {/* Header */}
           <header className="p-4 flex justify-between items-center gap-x-2">
             <Link
-              to="/member-dashboard"
+              to="/dashboard"
               className="flex-none font-semibold text-xl text-black focus:outline-none focus:opacity-80 dark:text-white flex items-center gap-2"
               aria-label="Brand"
               onClick={onClose}

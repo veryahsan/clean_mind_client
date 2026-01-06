@@ -38,7 +38,7 @@ const Login = () => {
       setSuccessMessage("Login successful!");
       setUsername("");
       setPassword("");
-      navigate("/member-dashboard", { replace: true });
+      navigate("/dashboard", { replace: true });
     } else {
       // Handle errors from the context
       const errorData = result.error;

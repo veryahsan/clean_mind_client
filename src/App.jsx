@@ -26,7 +26,7 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       if (window.location.pathname === "/") {
-        navigate("/member-dashboard");
+        navigate("/dashboard");
       }
     }
   }, [isAuthenticated, isLoading, navigate]);
@@ -40,7 +40,7 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
       <Route path="/verify-email/:token" element={<VerifyEmail />} />
       <Route path="/create-specialist" element={<CreateSpecialist />} />
       <Route
-        path="/member-dashboard"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <MemberDashboard />

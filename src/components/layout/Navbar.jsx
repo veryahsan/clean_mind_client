@@ -52,7 +52,7 @@ const Navbar = ({ sidebarOpen, setSidebarOpen, sidebarWidth = 256, isDesktop = f
               </RouterLink>
             ) : (
               <>
-                <RouterLink to="/member-dashboard" className="lg:hidden inline-flex items-center flex-shrink-0">
+                <RouterLink to="/dashboard" className="lg:hidden inline-flex items-center flex-shrink-0">
                   <img src={Logo} alt="CleanMind Logo" className="h-12 w-auto" />
                 </RouterLink>
                 {/* Daily Quote Capsule - Left side for authenticated users (only on desktop) */}
