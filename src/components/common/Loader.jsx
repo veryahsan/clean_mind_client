@@ -17,3 +17,4 @@ const Loader = ({ fullScreen = true, size = 40 }) => {
 
 export default Loader;
 
+

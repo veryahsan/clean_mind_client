@@ -30,7 +30,7 @@ const VerifyEmail = () => {
         if (responseData.success) {
           setSuccess(true);
           setMessage(responseData.message || "Email verified successfully!");
-          
+
           // Redirect to login after 3 seconds
           setTimeout(() => {
             navigate("/login", { replace: true });
@@ -40,7 +40,7 @@ const VerifyEmail = () => {
         }
       } catch (err) {
         const errorData = err.response?.data;
-        
+
         // Handle standardized error format
         if (errorData && errorData.success === false) {
           setError(errorData.message || "Verification failed");

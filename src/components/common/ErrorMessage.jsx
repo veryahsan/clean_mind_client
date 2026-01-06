@@ -19,3 +19,4 @@ const ErrorMessage = ({ message, title = "Error", fullScreen = false }) => {
 
 export default ErrorMessage;
 
+

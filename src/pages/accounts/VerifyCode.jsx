@@ -19,7 +19,7 @@ const VerifyCode = () => {
     if (location.state?.email) {
       setEmail(location.state.email);
     }
-    
+
     // Contextual info message
     if (location.state?.fromLogin) {
       setMessage("Your email is not verified. We have sent you a verification link. Please check your email and click the link to activate your account.");
