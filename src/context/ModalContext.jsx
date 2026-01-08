@@ -2,13 +2,23 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 const ModalContext = createContext();
-export const useModal = () => useContext(ModalContext);
+export const useModal = () => {
+  const context = useContext(ModalContext);
+  if (!context) {
+    throw new Error("useModal must be used within a ModalProvider");
+  }
+  return context;
+};
 
 export const ModalProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
   const [isClosing, setIsClosing] = useState(false);
 
   const openModal = useCallback((content) => {
+    if (!content) {
+      console.error("ModalContext: openModal called with no content");
+      return;
+    }
     setModalContent(content);
     setIsClosing(false);
   }, []);
@@ -38,13 +48,13 @@ export const ModalProvider = ({ children }) => {
       {children}
       {modalContent && (
         <div
-          className={`fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/30 transition-opacity duration-300 ${
+          className={`fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
             isClosing ? "opacity-0" : "opacity-100"
           }`}
           onClick={closeModal}
         >
           <div
-            className={`bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full relative transform transition-all duration-300 ${
+            className={`bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full relative transform transition-all duration-300 shadow-2xl ${
               isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -52,9 +62,22 @@ export const ModalProvider = ({ children }) => {
             {modalContent}
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-white"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Close modal"
             >
-              ✕
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
         </div>
