@@ -6,7 +6,7 @@ import ErrorMessage from "../common/ErrorMessage";
 import MoodSelectionModal from "../../modals/MoodSelectionModal";
 import {
   moodLabels,
-  moodIcons,
+  moodEmojis,
   moodBg,
 } from "../../constants/moods";
 
@@ -60,17 +60,9 @@ const MoodTracker = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {(() => {
-                const Icon = moodIcons[todayMood.mood_type];
-                return (
-                  <div className="flex-shrink-0">
-                    <Icon
-                      fontSize="large"
-                      className="text-gray-800 dark:text-gray-200"
-                    />
-                  </div>
-                );
-              })()}
+              <div className="flex-shrink-0 text-4xl">
+                {moodEmojis[todayMood.mood_type]}
+              </div>
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
                   Today's Mood

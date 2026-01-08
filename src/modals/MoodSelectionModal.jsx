@@ -4,7 +4,7 @@ import { useMood } from "../context/MoodContext";
 import {
   availableMoods,
   moodLabels,
-  moodIcons,
+  moodEmojis,
   moodBg,
 } from "../constants/moods";
 
@@ -49,7 +49,7 @@ const MoodSelectionModal = ({ initialMood = null, isUpdate = false }) => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 mb-6">
         {availableMoods.map((moodType) => {
-          const Icon = moodIcons[moodType];
+          const emoji = moodEmojis[moodType];
           const isSelected = selectedMood === moodType;
 
           return (
@@ -69,14 +69,9 @@ const MoodSelectionModal = ({ initialMood = null, isUpdate = false }) => {
                 disabled:opacity-50 disabled:cursor-not-allowed
               `}
             >
-              <Icon
-                fontSize="large"
-                className={`mb-1 sm:mb-2 transition-colors ${
-                  isSelected
-                    ? "text-indigo-700 dark:text-indigo-300"
-                    : "text-gray-700 dark:text-gray-300"
-                }`}
-              />
+              <span className="text-3xl sm:text-4xl mb-1 sm:mb-2 transition-transform hover:scale-110">
+                {emoji}
+              </span>
               <span
                 className={`text-[10px] sm:text-xs font-semibold ${
                   isSelected

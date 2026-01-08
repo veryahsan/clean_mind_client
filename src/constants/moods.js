@@ -1,11 +1,3 @@
-import {
-  SentimentVerySatisfied,
-  SentimentSatisfied,
-  SentimentNeutral,
-  SentimentDissatisfied,
-  Psychology,
-} from "@mui/icons-material";
-
 export const availableMoods = ["happy", "good", "neutral", "sad", "stressed"];
 
 export const moodLabels = {
@@ -16,12 +8,12 @@ export const moodLabels = {
   stressed: "Stressed",
 };
 
-export const moodIcons = {
-  happy: SentimentVerySatisfied,
-  good: SentimentSatisfied,
-  neutral: SentimentNeutral,
-  sad: SentimentDissatisfied,
-  stressed: Psychology,
+export const moodEmojis = {
+  happy: "😊",
+  good: "🙂",
+  neutral: "😐",
+  sad: "😔",
+  stressed: "😟",
 };
 
 export const moodBg = {
