@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import moodApi from "../../services/moodApi";
+import React, { useState } from "react";
+import { useMood } from "../../context/MoodContext";
 import Loader from "../common/Loader";
 import ErrorMessage from "../common/ErrorMessage";
 
@@ -11,91 +11,30 @@ import {
 } from "../../constants/moods";
 
 const MoodTracker = () => {
-  const [todayMood, setTodayMood] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const {
+    todayMood,
+    loading,
+    submitting,
+    error,
+    submitMood,
+    updateMood,
+    clearError,
+  } = useMood();
   const [showUpdate, setShowUpdate] = useState(false);
 
-  useEffect(() => {
-    fetchTodayMood();
-  }, []);
-
-  const fetchTodayMood = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await moodApi.get("today/");
-      const data = response.data;
-
-      if (data?.success && data.data?.has_mood) {
-        setTodayMood(data.data);
-      } else {
-        setTodayMood(null);
-      }
-    } catch (err) {
-      const errorData = err.response?.data;
-      setError(
-        errorData?.message || "Failed to load your mood. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleMoodSelect = async (moodType) => {
-    try {
-      setSubmitting(true);
-      setError("");
-      const response = await moodApi.post("", { mood_type: moodType });
-      const data = response.data;
-
-      if (data?.success) {
-        setTodayMood(data.data);
-        setShowUpdate(false);
-      }
-    } catch (err) {
-      const errorData = err.response?.data;
-      setError(
-        errorData?.message || "Failed to save your mood. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
+    clearError();
+    const result = await submitMood(moodType);
+    if (result.success) {
+      setShowUpdate(false);
     }
   };
 
   const handleUpdateMood = async (moodType) => {
-    if (!todayMood?.id) {
-      setError("Mood ID not found. Please refresh the page.");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      setError("");
-
-      const response = await moodApi.patch(`${todayMood.id}/`, {
-        mood_type: moodType,
-      });
-      const data = response.data;
-
-      if (data?.success) {
-        if (data.data?.has_mood) {
-          setTodayMood(data.data);
-        } else {
-          await fetchTodayMood();
-        }
-        setShowUpdate(false);
-      } else {
-        setError(data?.message || "Failed to update mood.");
-      }
-    } catch (err) {
-      const errorData = err.response?.data;
-      setError(
-        errorData?.message || "Failed to update your mood. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
+    clearError();
+    const result = await updateMood(moodType);
+    if (result.success) {
+      setShowUpdate(false);
     }
   };
 

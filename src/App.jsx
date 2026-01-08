@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { MoodProvider } from "./context/MoodContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
@@ -163,8 +164,10 @@ const AppContent = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <RouteChangeHandler />
-      <AppContent />
+      <MoodProvider>
+        <RouteChangeHandler />
+        <AppContent />
+      </MoodProvider>
     </AuthProvider>
   );
 };
