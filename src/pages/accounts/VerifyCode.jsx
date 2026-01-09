@@ -21,7 +21,9 @@ const VerifyCode = () => {
     }
 
     // Contextual info message
-    if (location.state?.fromLogin) {
+    if (location.state?.isAdmin) {
+      setMessage("Admin login requires email verification. We have sent you a verification link. Please check your email and click the link to complete your login.");
+    } else if (location.state?.fromLogin) {
       setMessage("Your email is not verified. We have sent you a verification link. Please check your email and click the link to activate your account.");
     } else if (location.state?.fromRegistration) {
       setMessage("We have sent you a verification link. Please check your email and click the link to activate your account.");

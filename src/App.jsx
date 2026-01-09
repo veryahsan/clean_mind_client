@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "./context/AuthContext";
+import moodApi from "./services/moodApi";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
@@ -16,16 +18,42 @@ import Messages from "./pages/messages/Messages.jsx";
 import Assistant from "./pages/assistant/Assistant.jsx";
 import Notifications from "./pages/notifications/Notifications.jsx";
 import Profile from "./pages/profile/Profile.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import MembersList from "./pages/admin/MembersList.jsx";
+import SpecialistsList from "./pages/admin/SpecialistsList.jsx";
+import CreateMember from "./pages/admin/CreateMember.jsx";
+import CreateSpecialistAdmin from "./pages/admin/CreateSpecialist.jsx";
+import AdminVerifyLogin from "./pages/admin/AdminVerifyLogin.jsx";
 import Footer from "./components/layout/Footer";
 import RouteChangeHandler from "./components/common/RouteChangeHandler";
 
-const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
+const AppRoutes = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      if (window.location.pathname === "/") {
+    if (!isLoading && isAuthenticated && window.location.pathname === "/") {
+      const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) {
+        navigate("/dashboard");
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode(accessToken);
+        const isAdmin = Boolean(decoded.is_staff) || Boolean(decoded.is_superuser);
+        const userRole = decoded.role || null;
+        
+        if (isAdmin) {
+          navigate("/admin");
+        } else if (userRole === "member") {
+          moodApi.get("today/")
+            .then(() => navigate("/dashboard"))
+            .catch(() => navigate("/dashboard"));
+        } else {
+          navigate("/dashboard");
+        }
+      } catch {
         navigate("/dashboard");
       }
     }
@@ -38,7 +66,48 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
       <Route path="/register" element={<Register />} />
       <Route path="/verify-code" element={<VerifyCode />} />
       <Route path="/verify-email/:token" element={<VerifyEmail />} />
+      <Route path="/admin/verify-login/:token" element={<AdminVerifyLogin />} />
       <Route path="/create-specialist" element={<CreateSpecialist />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/members"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <MembersList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/specialists"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <SpecialistsList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/create-member"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <CreateMember />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/create-specialist"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <CreateSpecialistAdmin />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={
@@ -93,16 +162,19 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => {
 
 const AppContent = () => {
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== "undefined") {
-      return window.innerWidth >= 1024 && isAuthenticated; // lg breakpoint
+      return window.innerWidth >= 1024 && isAuthenticated && !isAdminRoute;
     }
     return false;
   });
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     if (typeof window !== "undefined") {
       const savedWidth = localStorage.getItem("sidebar-width");
-      return savedWidth ? parseInt(savedWidth, 10) : 256; // Default to w-64 (256px)
+      return savedWidth ? parseInt(savedWidth, 10) : 256;
     }
     return 256;
   });
@@ -113,30 +185,27 @@ const AppContent = () => {
     return false;
   });
 
-  // Check if we're on desktop
   useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-    
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
-  // Update sidebar state when authentication changes with smooth transition
   useEffect(() => {
-    // Add a small delay to allow auth state to settle before changing sidebar
     const timer = setTimeout(() => {
-      if (isAuthenticated && window.innerWidth >= 1024) {
+      if (isAuthenticated && window.innerWidth >= 1024 && !isAdminRoute) {
         setSidebarOpen(true);
-      } else if (!isAuthenticated) {
+      } else if (!isAuthenticated || isAdminRoute) {
         setSidebarOpen(false);
       }
     }, 50);
-
     return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAdminRoute, location.pathname]);
+
+  if (isAdminRoute) {
+    return <AppRoutes />;
+  }
 
   return (
     <>
@@ -153,7 +222,7 @@ const AppContent = () => {
         }`}
         style={isAuthenticated && isDesktop ? { marginLeft: `${sidebarWidth}px` } : {}}
       >
-        <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <AppRoutes />
         <Footer />
       </div>
     </>

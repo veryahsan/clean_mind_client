@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import moodApi from "../../services/moodApi";
 import SuccessMessage from "../../components/common/SuccessMessage";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -38,17 +40,53 @@ const Login = () => {
       setSuccessMessage("Login successful!");
       setUsername("");
       setPassword("");
-      navigate("/dashboard", { replace: true });
-    } else {
-      // Handle errors from the context
-      const errorData = result.error;
       
-      // Check if error is about email verification
+      setTimeout(async () => {
+        const accessToken = localStorage.getItem("access_token");
+        if (!accessToken) {
+          navigate("/dashboard", { replace: true });
+          return;
+        }
+
+        try {
+          const decoded = jwtDecode(accessToken);
+          const isAdmin = Boolean(decoded.is_staff) || Boolean(decoded.is_superuser);
+          const userRole = decoded.role || null;
+          
+          if (isAdmin) {
+            navigate("/admin", { replace: true });
+            return;
+          }
+          
+          if (userRole === "member") {
+            try {
+              await moodApi.get("today/");
+            } catch {
+              // Continue to dashboard even if mood check fails
+            }
+            navigate("/dashboard", { replace: true });
+          } else {
+            navigate("/dashboard", { replace: true });
+          }
+        } catch {
+          navigate("/dashboard", { replace: true });
+        }
+      }, 50);
+    } else if (result.adminVerificationRequired) {
+      navigate("/verify-code", {
+        state: {
+          email: result.email,
+          fromLogin: true,
+          isAdmin: true,
+        },
+        replace: true,
+      });
+    } else {
+      const errorData = result.error;
       const errorMessage = errorData.message || 
         (errorData.non_field_errors && (Array.isArray(errorData.non_field_errors) ? errorData.non_field_errors[0] : errorData.non_field_errors)) ||
         "";
       
-      // Check for email verification errors (case-insensitive)
       const isVerificationError = errorMessage && (
         errorMessage.toLowerCase().includes("not activated") || 
         errorMessage.toLowerCase().includes("verify your email") ||
@@ -57,10 +95,7 @@ const Login = () => {
       );
       
       if (isVerificationError) {
-        // Get user email from error response if available
         const userEmail = errorData.email || errorData.errors?.email || "";
-        
-        // Redirect to "check your email" verification info page
         navigate("/verify-code", {
           state: {
             email: userEmail,
@@ -69,60 +104,46 @@ const Login = () => {
           },
           replace: true,
         });
-        return; // Don't show error, just redirect
+        return;
+      }
+      
+      const fieldErrors = {};
+      if (errorData.errors) {
+        Object.keys(errorData.errors).forEach((key) => {
+          fieldErrors[key] = Array.isArray(errorData.errors[key])
+            ? errorData.errors[key][0]
+            : errorData.errors[key];
+        });
+      }
+      
+      if (errorData.password && !fieldErrors.password) {
+        fieldErrors.password = Array.isArray(errorData.password) 
+          ? errorData.password[0] 
+          : errorData.password;
+      }
+      if (errorData.username && !fieldErrors.username) {
+        fieldErrors.username = Array.isArray(errorData.username) 
+          ? errorData.username[0] 
+          : errorData.username;
+      }
+      
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
       } else {
-        // Handle standardized error format
-        // Priority: field-specific errors (password, username) > non_field_errors > message
-        const fieldErrors = {};
-        
-        // Check for field-specific errors first (password, username, etc.)
-        if (errorData.errors) {
-          Object.keys(errorData.errors).forEach((key) => {
-            if (Array.isArray(errorData.errors[key])) {
-              fieldErrors[key] = errorData.errors[key][0];
-            } else {
-              fieldErrors[key] = errorData.errors[key];
-            }
-          });
+        let errorMsg = "";
+        if (errorData.non_field_errors) {
+          errorMsg = Array.isArray(errorData.non_field_errors) 
+            ? errorData.non_field_errors[0] 
+            : errorData.non_field_errors;
+        } else if (errorData.errors?.non_field_errors) {
+          errorMsg = Array.isArray(errorData.errors.non_field_errors)
+            ? errorData.errors.non_field_errors[0]
+            : errorData.errors.non_field_errors;
+        } else if (errorData.message) {
+          errorMsg = errorData.message;
         }
         
-        // Also check top-level field errors (backward compatibility)
-        if (errorData.password && !fieldErrors.password) {
-          fieldErrors.password = Array.isArray(errorData.password) 
-            ? errorData.password[0] 
-            : errorData.password;
-        }
-        if (errorData.username && !fieldErrors.username) {
-          fieldErrors.username = Array.isArray(errorData.username) 
-            ? errorData.username[0] 
-            : errorData.username;
-        }
-        
-        // If we have field-specific errors, use them
-        if (Object.keys(fieldErrors).length > 0) {
-          setErrors(fieldErrors);
-        } else {
-          // No field-specific errors, check for general errors
-          let errorMessage = "";
-          
-          if (errorData.non_field_errors) {
-            errorMessage = Array.isArray(errorData.non_field_errors) 
-              ? errorData.non_field_errors[0] 
-              : errorData.non_field_errors;
-          } else if (errorData.errors?.non_field_errors) {
-            errorMessage = Array.isArray(errorData.errors.non_field_errors)
-              ? errorData.errors.non_field_errors[0]
-              : errorData.errors.non_field_errors;
-          } else if (errorData.message) {
-            errorMessage = errorData.message;
-          }
-          
-          if (errorMessage) {
-            setErrors({ general: errorMessage });
-          } else {
-            setErrors({ general: "Login failed. Please check your credentials and try again." });
-          }
-        }
+        setErrors({ general: errorMsg || "Login failed. Please check your credentials and try again." });
       }
     }
 

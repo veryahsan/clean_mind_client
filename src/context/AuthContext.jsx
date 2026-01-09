@@ -64,12 +64,19 @@ export const AuthProvider = ({ children }) => {
         id: decoded.user_id,
         username: decoded.username,
         role: decoded.role,
+        is_staff: decoded.is_staff || false,
+        is_superuser: decoded.is_superuser || false,
       };
 
       // Try to fetch full profile data including headshot
       const profileData = await fetchUserProfile();
       if (profileData) {
-        userData = profileData;
+        // Merge profile data but preserve is_staff and is_superuser from JWT (they're more reliable)
+        userData = {
+          ...profileData,
+          is_staff: profileData.is_staff !== undefined ? profileData.is_staff : userData.is_staff,
+          is_superuser: profileData.is_superuser !== undefined ? profileData.is_superuser : userData.is_superuser,
+        };
       }
 
       setUser(userData);
@@ -93,6 +100,18 @@ export const AuthProvider = ({ children }) => {
       
       // Handle standardized response format
       const responseData = response.data;
+      
+      // Check if admin verification is required
+      if (responseData.success && responseData.data?.admin_verification_required) {
+        return {
+          success: false,
+          adminVerificationRequired: true,
+          userId: responseData.data.user_id,
+          email: responseData.data.email,
+          message: responseData.message || "Admin login requires verification. A code has been sent to your email.",
+        };
+      }
+      
       let access, refresh;
       
       if (responseData.success && responseData.data) {
@@ -113,12 +132,19 @@ export const AuthProvider = ({ children }) => {
           id: decoded.user_id,
           username: decoded.username,
           role: decoded.role,
+          is_staff: decoded.is_staff || false,
+          is_superuser: decoded.is_superuser || false,
         };
 
         // Try to fetch full profile data including headshot
         const profileData = await fetchUserProfile();
         if (profileData) {
-          userData = profileData;
+          // Merge profile data but preserve is_staff and is_superuser from JWT
+          userData = {
+            ...profileData,
+            is_staff: profileData.is_staff !== undefined ? profileData.is_staff : userData.is_staff,
+            is_superuser: profileData.is_superuser !== undefined ? profileData.is_superuser : userData.is_superuser,
+          };
         }
 
         setUser(userData);
