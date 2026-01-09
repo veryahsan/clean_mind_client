@@ -19,7 +19,7 @@ const LogoutModal = ({ onConfirm }) => {
         Sign Out
       </h3>
 
-      <p className="text-gray-600 dark:text-gray-300 mb-6">
+      <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md">
         Are you sure you want to sign out? You'll need to sign in again to access your account.
       </p>
 

@@ -59,7 +59,7 @@ const MoodSelectionModal = ({ initialMood = null, isUpdate = false }) => {
               disabled={submitting}
               className={`
                 flex flex-col items-center justify-center py-3 sm:py-4 rounded-xl
-                border-2 transition-all duration-200
+                border-2 transition-all duration-200 aspect-square min-w-[70px] sm:min-w-[80px]
                 ${
                   isSelected
                     ? `${moodBg[moodType]} border-indigo-500 ring-2 ring-indigo-400/40 shadow-lg scale-[1.05]`
