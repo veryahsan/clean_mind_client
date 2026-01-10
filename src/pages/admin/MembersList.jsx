@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminNavbar from "../../components/layout/AdminNavbar";
-import api from "../../services/api";
+import adminApi from "../../services/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -18,7 +18,7 @@ const MembersList = () => {
     try {
       setLoading(true);
       setError("");
-      const response = await api.get("admin/members/");
+      const response = await adminApi.get("members/");
       const data = response.data;
 
       if (data?.success) {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { jwtDecode } from "jwt-decode";
-import api from "../../services/api";
+import adminApi from "../../services/adminApi";
 import moodApi from "../../services/moodApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
@@ -34,7 +34,7 @@ const AdminVerifyLogin = () => {
         setLoading(true);
         setError("");
 
-        const response = await api.get(`admin/verify-login/${token}/`);
+        const response = await adminApi.get(`verify-login/${token}/`);
         const responseData = response.data;
 
         if (responseData.success && responseData.data) {

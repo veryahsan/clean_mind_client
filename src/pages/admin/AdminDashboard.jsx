@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminNavbar from "../../components/layout/AdminNavbar";
-import api from "../../services/api";
+import adminApi from "../../services/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       setError("");
-      const response = await api.get("admin/dashboard/");
+      const response = await adminApi.get("dashboard/");
       const data = response.data;
 
       if (data?.success) {
