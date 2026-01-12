@@ -13,6 +13,11 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
     return <Navigate to="/login" replace />;
   }
 
+  //only for admin users
+  if (!requireAdmin && (user?.is_staff || user?.is_superuser)) {
+    return <Navigate to="/admin" replace />;
+  }
+
   if (requireAdmin && !user?.is_staff && !user?.is_superuser) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -21,6 +26,3 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 };
 
 export default ProtectedRoute;
-
-
-

@@ -20,7 +20,7 @@ const AppContent = () => {
     if (!isLoading && isAuthenticated && window.location.pathname === "/") {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
         return;
       }
 
@@ -28,20 +28,15 @@ const AppContent = () => {
         const decoded = jwtDecode(accessToken);
         const isAdmin =
           Boolean(decoded.is_staff) || Boolean(decoded.is_superuser);
-        const userRole = decoded.role || null;
 
         if (isAdmin) {
-          navigate("/admin");
-        } else if (userRole === "member") {
-          moodApi
-            .get("today/")
-            .then(() => navigate("/dashboard"))
-            .catch(() => navigate("/dashboard"));
+          navigate("/admin", { replace: true });
         } else {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         }
-      } catch {
-        navigate("/dashboard");
+      } catch (error) {
+        console.error("Token decode error:", error);
+        navigate("/dashboard", { replace: true });
       }
     }
   }, [isAuthenticated, isLoading, navigate]);

@@ -5,6 +5,7 @@ import GuestRoute from "../components/auth/GuestRoute";
 
 // Public Pages
 import Home from "../pages/home/Home";
+import NotFound from "../pages/not_found/NotFound";
 
 // Auth Pages
 import Login from "../pages/accounts/Login";
@@ -27,6 +28,8 @@ import MembersList from "../pages/admin/MembersList";
 import SpecialistsList from "../pages/admin/SpecialistsList";
 import CreateMember from "../pages/admin/CreateMember";
 import CreateSpecialistAdmin from "../pages/admin/CreateSpecialist";
+import EditMember from "../pages/admin/EditMember";
+import EditSpecialist from "../pages/admin/EditSpecialist";
 import AdminVerifyLogin from "../pages/admin/AdminVerifyLogin";
 
 const AppRoutes = () => {
@@ -121,6 +124,22 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/edit-member/:memberId"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <EditMember />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/edit-specialist/:specialistId"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <EditSpecialist />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ==================== USER ROUTES ==================== */}
       <Route
@@ -171,6 +190,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

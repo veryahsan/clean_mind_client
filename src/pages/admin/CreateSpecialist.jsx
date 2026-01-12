@@ -46,14 +46,28 @@ const CreateSpecialist = () => {
     setSuccess("");
 
     // Validate custom type if selected
-    if (formData.specialist_type === "custom" && !formData.custom_specialist_type.trim()) {
+    if (
+      formData.specialist_type === "custom" &&
+      !formData.custom_specialist_type.trim()
+    ) {
       setError("Please enter a custom specialist type");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await api.post("create-specialist/", formData);
+      // Prepare payload - use custom_specialist_type if "custom" is selected, otherwise use specialist_type
+      const payload = {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        specialist_type:
+          formData.specialist_type === "custom"
+            ? formData.custom_specialist_type.trim()
+            : formData.specialist_type,
+      };
+
+      const response = await api.post("create-specialist/", payload);
       const data = response.data;
 
       if (data?.success) {
@@ -78,7 +92,9 @@ const CreateSpecialist = () => {
         const errorMessages = Object.values(errorData.errors).flat();
         setError(errorMessages.join(", ") || "Failed to create specialist");
       } else {
-        setError(errorData?.message || "Failed to create specialist. Please try again.");
+        setError(
+          errorData?.message || "Failed to create specialist. Please try again."
+        );
       }
     } finally {
       setLoading(false);
@@ -208,7 +224,11 @@ const CreateSpecialist = () => {
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? <Loader fullScreen={false} size={20} /> : "Create Specialist"}
+                {loading ? (
+                  <Loader fullScreen={false} size={20} />
+                ) : (
+                  "Create Specialist"
+                )}
               </button>
               <button
                 type="button"
@@ -226,4 +246,3 @@ const CreateSpecialist = () => {
 };
 
 export default CreateSpecialist;
-
