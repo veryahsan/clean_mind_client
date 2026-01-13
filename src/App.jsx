@@ -92,12 +92,7 @@ const AppContent = () => {
   // Regular routes with navbar/sidebar
   return (
     <>
-      <Navbar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        sidebarWidth={sidebarWidth}
-        isDesktop={isDesktop}
-      />
+      <Navbar />
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -116,6 +111,33 @@ const AppContent = () => {
             : {}
         }
       >
+        {/* Mobile Sidebar Toggle Button - Only show when authenticated and on mobile */}
+        {isAuthenticated && !isDesktop && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="fixed top-4 left-4 z-40 flex justify-center items-center size-10 text-gray-600 hover:bg-gray-100 rounded-lg bg-white shadow-lg border border-gray-200 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 transition"
+            aria-label="Toggle navigation"
+          >
+            <svg
+              className="shrink-0 size-6"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M15 3v18" />
+              <path d="m10 15-3-3 3-3" />
+            </svg>
+            <span className="sr-only">Navigation Toggle</span>
+          </button>
+        )}
         <AppRoutes />
         <Footer />
       </div>

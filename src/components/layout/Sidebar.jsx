@@ -210,14 +210,14 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     },
     {
       id: "assistant",
-      name: "Personal Assistant AI",
+      name: "Personal Assistant",
       path: "/assistant",
       icon: (
         <svg
           className="size-4"
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
+          width="30"
+          height="30"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -309,7 +309,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                       <Link
                         to={item.path}
                         onClick={onClose}
-                        className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                        className={`flex items-center gap-x-1.5 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
                           active
                             ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
                             : "text-gray-800 dark:text-neutral-200"
@@ -323,103 +323,126 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                 })}
               </ul>
 
-              {/* Mobile-only Profile, Settings, and Logout */}
-              <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700">
-                <ul className="space-y-1">
-                  {/* Profile */}
-                  <li>
-                    <Link
-                      to="/profile"
-                      onClick={onClose}
-                      className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
-                        isActive("/profile")
-                          ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
-                          : "text-gray-800 dark:text-neutral-200"
-                      }`}
-                    >
-                      <svg
-                        className="size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                      Profile
-                    </Link>
-                  </li>
-
-                  {/* Settings */}
-                  <li>
-                    <Link
-                      to="/settings"
-                      onClick={onClose}
-                      className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
-                        isActive("/settings")
-                          ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
-                          : "text-gray-800 dark:text-neutral-200"
-                      }`}
-                    >
-                      <svg
-                        className="size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
-                      </svg>
-                      Settings
-                    </Link>
-                  </li>
-
-                  {/* Logout */}
-                  <li>
-                    <button
-                      type="button"
-                      onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-red-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
-                    >
-                      <svg
-                        className="size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" x2="9" y1="12" y2="12" />
-                      </svg>
-                      Sign out
-                    </button>
-                  </li>
-                </ul>
-              </div>
             </div>
           </nav>
           {/* End Body */}
 
-          {/* Footer at bottom of sidebar */}
-          <AuthenticatedFooter className="mt-auto" />
+          {/* Profile Section at bottom */}
+          <div className="mt-auto border-t border-gray-200 dark:border-neutral-700">
+            {/* User Info */}
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <UserAvatar 
+                  username={user?.username} 
+                  headshot={user?.headshot} 
+                  has_headshot={user?.has_headshot}
+                  size={40} 
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {user?.first_name && user?.last_name
+                      ? `${user.first_name} ${user.last_name}`
+                      : user?.username || "User"}
+                  </p>
+                  {user?.email && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Profile Menu Links */}
+              <ul className="space-y-1">
+                <li>
+                  <Link
+                    to="/profile"
+                    onClick={onClose}
+                    className={`flex items-center gap-x-3 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                      isActive("/profile")
+                        ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
+                        : "text-gray-800 dark:text-neutral-200"
+                    }`}
+                  >
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    Profile
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/settings"
+                    onClick={onClose}
+                    className={`flex items-center gap-x-3 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                      isActive("/settings")
+                        ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
+                        : "text-gray-800 dark:text-neutral-200"
+                    }`}
+                  >
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+                    </svg>
+                    Settings
+                  </Link>
+                </li>
+
+                <li>
+                  <button
+                    type="button"
+                    onClick={handleLogoutClick}
+                    className="w-full flex items-center gap-x-3 py-2 px-2 text-sm text-red-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition"
+                  >
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
+                    Sign out
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Footer at bottom of sidebar */}
+            <AuthenticatedFooter />
+          </div>
         </div>
 
         {/* Resize Handle */}
