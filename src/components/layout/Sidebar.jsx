@@ -247,7 +247,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
         ref={sidebarRef}
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transform h-full fixed top-0 start-0 bottom-0 z-50 bg-white border-e border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 w-64 ${
+        } lg:translate-x-0 transform h-full fixed top-0 start-0 bottom-0 z-50 bg-gradient-to-b from-white via-white to-gray-50/50 border-e border-gray-200/80 shadow-lg dark:from-neutral-800 dark:via-neutral-800 dark:to-neutral-900/50 dark:border-neutral-700 w-64 ${
           isResizing ? "" : "transition-all duration-300 ease-in-out"
         }`}
         style={{ 
@@ -259,10 +259,10 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       >
         <div className="relative flex flex-col h-full max-h-full">
           {/* Header */}
-          <header className="p-4 flex justify-between items-center gap-x-2">
+          <header className="p-4 flex justify-between items-center gap-x-2 border-b border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-r from-indigo-50/30 to-transparent dark:from-indigo-900/10">
             <Link
               to="/dashboard"
-              className="flex-none font-semibold text-xl text-black focus:outline-none focus:opacity-80 dark:text-white flex items-center gap-2"
+              className="flex-none font-semibold text-xl text-gray-900 focus:outline-none focus:opacity-80 dark:text-white flex items-center gap-2.5"
               aria-label="Brand"
               onClick={onClose}
             >
@@ -274,7 +274,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
               {/* Close Button */}
               <button
                 type="button"
-                className="flex justify-center items-center gap-x-3 size-6 bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200"
+                className="flex justify-center items-center gap-x-3 size-8 bg-white/80 backdrop-blur-sm border border-gray-200/60 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-gray-500/20 transition-colors duration-150 dark:bg-neutral-700/80 dark:border-neutral-600 dark:text-neutral-400 dark:hover:bg-neutral-600"
                 onClick={onClose}
               >
                 <svg
@@ -299,9 +299,9 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           {/* End Header */}
 
           {/* Body */}
-          <nav className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            <div className="pb-0 px-2 w-full flex flex-col flex-wrap">
-              <ul className="space-y-1">
+          <nav className="flex-1 overflow-y-auto py-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-300/60 hover:[&::-webkit-scrollbar-thumb]:bg-indigo-400/80 dark:[&::-webkit-scrollbar-thumb]:bg-indigo-600/40 dark:hover:[&::-webkit-scrollbar-thumb]:bg-indigo-500/60 transition-colors">
+            <div className="pb-0 px-3 w-full flex flex-col flex-wrap">
+              <ul className="space-y-1.5">
                 {menuItems.map((item) => {
                   const active = isActive(item.path);
                   return (
@@ -309,14 +309,14 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                       <Link
                         to={item.path}
                         onClick={onClose}
-                        className={`flex items-center gap-x-1.5 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                        className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                           active
-                            ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
-                            : "text-gray-800 dark:text-neutral-200"
+                            ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                         }`}
                       >
-                        {item.icon}
-                        {item.name}
+                        <span>{item.icon}</span>
+                        <span>{item.name}</span>
                       </Link>
                     </li>
                   );
@@ -328,24 +328,27 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           {/* End Body */}
 
           {/* Profile Section at bottom */}
-          <div className="mt-auto border-t border-gray-200 dark:border-neutral-700">
+          <div className="mt-auto border-t border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-neutral-900/30">
             {/* User Info */}
             <div className="p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <UserAvatar 
-                  username={user?.username} 
-                  headshot={user?.headshot} 
-                  has_headshot={user?.has_headshot}
-                  size={40} 
-                />
+              <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-gradient-to-r from-indigo-50/50 to-purple-50/30 dark:from-indigo-900/20 dark:to-purple-900/10 border border-indigo-100/50 dark:border-indigo-800/30 shadow-sm">
+                <div className="relative">
+                  <UserAvatar 
+                    username={user?.username} 
+                    headshot={user?.headshot} 
+                    has_headshot={user?.has_headshot}
+                    size={44} 
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {user?.first_name && user?.last_name
                       ? `${user.first_name} ${user.last_name}`
                       : user?.username || "User"}
                   </p>
                   {user?.email && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-0.5">
                       {user.email}
                     </p>
                   )}
@@ -353,15 +356,15 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
               </div>
 
               {/* Profile Menu Links */}
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 <li>
                   <Link
                     to="/profile"
                     onClick={onClose}
-                    className={`flex items-center gap-x-3 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                    className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                       isActive("/profile")
-                        ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
-                        : "text-gray-800 dark:text-neutral-200"
+                        ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                     }`}
                   >
                     <svg
@@ -387,10 +390,10 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                   <Link
                     to="/settings"
                     onClick={onClose}
-                    className={`flex items-center gap-x-3 py-2 px-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition ${
+                    className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                       isActive("/settings")
-                        ? "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-white"
-                        : "text-gray-800 dark:text-neutral-200"
+                        ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                     }`}
                   >
                     <svg
@@ -416,7 +419,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                   <button
                     type="button"
                     onClick={handleLogoutClick}
-                    className="w-full flex items-center gap-x-3 py-2 px-2 text-sm text-red-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition"
+                    className="w-full flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                   >
                     <svg
                       className="size-4"
@@ -449,10 +452,10 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
         <div
           ref={resizeHandleRef}
           onMouseDown={handleMouseDown}
-          className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 w-3 h-12 cursor-col-resize rounded-md transition-all duration-200 group ${
+          className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 w-3 h-16 cursor-col-resize rounded-lg transition-all duration-200 group ${
             isResizing 
-              ? "bg-indigo-500 scale-110" 
-              : "bg-gray-300 dark:bg-gray-600 hover:bg-indigo-400 dark:hover:bg-indigo-500 hover:scale-105"
+              ? "bg-gradient-to-b from-indigo-500 to-indigo-600 scale-110 shadow-lg shadow-indigo-500/50" 
+              : "bg-gradient-to-b from-indigo-200 to-indigo-300 dark:from-indigo-700 dark:to-indigo-800 hover:from-indigo-400 hover:to-indigo-500 dark:hover:from-indigo-600 dark:hover:to-indigo-700 hover:scale-105 hover:shadow-md"
           }`}
           style={{ 
             zIndex: 60,
@@ -461,11 +464,11 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           aria-label="Resize sidebar"
         >
           {/* Visual indicator dots */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-60 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="flex flex-col gap-1">
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-70 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="flex flex-col gap-1.5">
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
+              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
             </div>
           </div>
         </div>
