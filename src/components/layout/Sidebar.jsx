@@ -16,7 +16,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useModal();
-  const [expandedItems, setExpandedItems] = useState({});
   const [isResizing, setIsResizing] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const sidebarRef = useRef(null);
@@ -100,13 +99,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   // Only show sidebar when authenticated
   if (!isAuthenticated) return null;
 
-  const toggleItem = (itemId) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [itemId]: !prev[itemId],
-    }));
-  };
-
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -118,14 +110,14 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       path: "/dashboard",
       icon: (
         <svg
-          className="size-4"
+          className="size-5"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -140,14 +132,14 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       path: "/calendar",
       icon: (
         <svg
-          className="size-4"
+          className="size-5"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -155,12 +147,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           <line x1="16" x2="16" y1="2" y2="6" />
           <line x1="8" x2="8" y1="2" y2="6" />
           <line x1="3" x2="21" y1="10" y2="10" />
-          <path d="M8 14h.01" />
-          <path d="M12 14h.01" />
-          <path d="M16 14h.01" />
-          <path d="M8 18h.01" />
-          <path d="M12 18h.01" />
-          <path d="M16 18h.01" />
         </svg>
       ),
     },
@@ -170,18 +156,20 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       path: "/messages",
       icon: (
         <svg
-          className="size-4"
+          className="size-5"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <path d="M13 8H8" />
+          <path d="M17 12H8" />
         </svg>
       ),
     },
@@ -191,8 +179,10 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       path: "/notifications",
       icon: (
         <svg
-          className="size-4"
+          className="size-5"
           xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -200,11 +190,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path
-            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
         </svg>
       ),
     },
@@ -214,18 +200,19 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       path: "/assistant",
       icon: (
         <svg
-          className="size-4"
+          className="size-5"
           xmlns="http://www.w3.org/2000/svg"
-          width="30"
-          height="30"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          <path d="M12 3v3m0 12v3m9-9h-3m-12 0H3m15.364-6.364l-2.121 2.121M6.757 17.243l-2.121 2.121m14.142 0l-2.121-2.121M6.757 6.757L4.636 4.636" />
+          <circle cx="12" cy="12" r="2" />
         </svg>
       ),
     },
@@ -309,7 +296,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                       <Link
                         to={item.path}
                         onClick={onClose}
-                        className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                        className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                           active
                             ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -361,21 +348,21 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                   <Link
                     to="/profile"
                     onClick={onClose}
-                    className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                    className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                       isActive("/profile")
                         ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                     }`}
                   >
                     <svg
-                      className="size-4"
+                      className="size-5"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
@@ -390,21 +377,21 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                   <Link
                     to="/settings"
                     onClick={onClose}
-                    className={`flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                    className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
                       isActive("/settings")
                         ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                     }`}
                   >
                     <svg
-                      className="size-4"
+                      className="size-5"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
@@ -419,10 +406,10 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                   <button
                     type="button"
                     onClick={handleLogoutClick}
-                    className="w-full flex items-center gap-x-3 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                    className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                   >
                     <svg
-                      className="size-4"
+                      className="size-5"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
