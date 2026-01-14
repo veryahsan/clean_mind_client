@@ -318,7 +318,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           <div className="mt-auto border-t border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-neutral-900/30">
             {/* User Info */}
             <div className="p-4">
-              <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-gradient-to-r from-indigo-50/50 to-purple-50/30 dark:from-indigo-900/20 dark:to-purple-900/10 border border-indigo-100/50 dark:border-indigo-800/30 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="relative">
                   <UserAvatar 
                     username={user?.username} 
