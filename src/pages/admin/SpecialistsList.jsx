@@ -9,6 +9,7 @@ import SuccessMessage from "../../components/common/SuccessMessage";
 const SpecialistsList = () => {
   const navigate = useNavigate();
   const [specialists, setSpecialists] = useState([]);
+  const [documentCounts, setDocumentCounts] = useState({}); // Track document counts per specialist
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -18,6 +19,13 @@ const SpecialistsList = () => {
   useEffect(() => {
     fetchSpecialists();
   }, []);
+
+  // Fetch document counts for all specialists
+  useEffect(() => {
+    if (specialists.length > 0) {
+      fetchDocumentCounts();
+    }
+  }, [specialists]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -68,6 +76,30 @@ const SpecialistsList = () => {
     }
   };
 
+  const fetchDocumentCounts = async () => {
+    // Fetch document counts for all specialists
+    const counts = {};
+    for (const specialist of specialists) {
+      try {
+        const response = await adminApi.get(`specialists/${specialist.id}/documents/`);
+        const data = response.data;
+        if (data?.success && data.data) {
+          counts[specialist.id] = {
+            count: data.data.length,
+            hasDocuments: data.data.length > 0,
+            hasVerifiedDocuments: data.data.some(doc => doc.verification_status === 'approved')
+          };
+        } else {
+          counts[specialist.id] = { count: 0, hasDocuments: false, hasVerifiedDocuments: false };
+        }
+      } catch {
+        // If error, assume no documents
+        counts[specialist.id] = { count: 0, hasDocuments: false, hasVerifiedDocuments: false };
+      }
+    }
+    setDocumentCounts(counts);
+  };
+
   const handleEdit = (specialistId) => {
     console.log("Edit clicked for specialist:", specialistId);
     setOpenMenuId(null);
@@ -105,6 +137,21 @@ const SpecialistsList = () => {
 
   const toggleMenu = (specialistId) => {
     setOpenMenuId(openMenuId === specialistId ? null : specialistId);
+  };
+
+  const handleManageDocuments = (specialistId) => {
+    navigate(`/admin/specialists/${specialistId}/documents`);
+  };
+
+  const getVerificationStatus = (specialistId) => {
+    const docInfo = documentCounts[specialistId];
+    if (!docInfo || !docInfo.hasDocuments) {
+      return { status: 'unverified', label: 'Unverified', color: 'text-red-600 dark:text-red-400' };
+    }
+    if (docInfo.hasVerifiedDocuments) {
+      return { status: 'verified', label: 'Verified', color: 'text-green-600 dark:text-green-400' };
+    }
+    return { status: 'pending', label: 'Pending', color: 'text-yellow-600 dark:text-yellow-400' };
   };
 
   if (loading) {
@@ -166,6 +213,9 @@ const SpecialistsList = () => {
                     Specialist Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Verification Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Joined
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -198,11 +248,29 @@ const SpecialistsList = () => {
                         {specialist.specialist_type_display || specialist.specialist_type || "-"}
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        const statusInfo = getVerificationStatus(specialist.id);
+                        return (
+                          <span className={`text-sm font-medium ${statusInfo.color}`}>
+                            {statusInfo.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {specialist.date_joined ? new Date(specialist.date_joined).toLocaleDateString() : "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium relative">
-                      <div className="relative" ref={(el) => (menuRefs.current[specialist.id] = el)}>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleManageDocuments(specialist.id)}
+                          className="px-3 py-1.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 rounded-lg transition"
+                        >
+                          {documentCounts[specialist.id]?.hasDocuments ? "📄 Update Documents" : "+ Add Documents"}
+                        </button>
+                        <div className="relative" ref={(el) => (menuRefs.current[specialist.id] = el)}>
                         <button
                           type="button"
                           onClick={(e) => {
@@ -250,6 +318,7 @@ const SpecialistsList = () => {
                             </div>
                           </div>
                         )}
+                        </div>
                       </div>
                     </td>
                   </tr>
