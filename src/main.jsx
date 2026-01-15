@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext";
 import { MoodProvider } from "./context/MoodContext";
 import { ModalProvider } from "./context/ModalContext";
+import { CardProvider } from "./context/CardContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <MoodProvider>
           <ModalProvider>
-            <App />
+            <CardProvider>
+              <App />
+            </CardProvider>
           </ModalProvider>
         </MoodProvider>
       </AuthProvider>
