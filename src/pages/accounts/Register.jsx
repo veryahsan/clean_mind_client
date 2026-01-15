@@ -1,54 +1,100 @@
 import React, { useState } from "react";
 import api from "../../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "../../hooks/useForm";
 import SuccessMessage from "../../components/common/SuccessMessage";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const Register = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState({});
-  const [generalError, setGeneralError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const validate = () => {
-    const newErrors = {};
-
-    if (!username.trim()) newErrors.username = "Username is required";
-    else if (!/^[a-zA-Z0-9@.+\-_]+$/.test(username))
-      newErrors.username = "Only letters, numbers, and @ . + - _ are allowed";
-
-    if (!email.trim()) newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      newErrors.email = "Enter a valid email address";
-
-    if (!password) newErrors.password = "Password is required";
-    else if (password.length < 8)
-      newErrors.password = "Password must be at least 8 characters";
-
-    if (!confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password";
-    else if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  // Validation rules
+  const validationRules = {
+    username: {
+      required: "Username is required",
+      pattern: {
+        value: /^[a-zA-Z0-9@.+\-_]+$/,
+        message: "Only letters, numbers, and @ . + - _ are allowed",
+      },
+    },
+    email: {
+      required: "Email is required",
+      pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Enter a valid email address",
+      },
+    },
+    password: {
+      required: "Password is required",
+      minLength: {
+        value: 8,
+        message: "Password must be at least 8 characters",
+      },
+    },
+    confirmPassword: {
+      required: "Please confirm your password",
+      custom: (value, allValues) => {
+        if (value !== allValues.password) {
+          return "Passwords do not match";
+        }
+        return "";
+      },
+    },
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  // Extract error message from response
+  const extractErrorMessage = (errorData) => {
+    if (errorData.message) return errorData.message;
+    if (errorData.non_field_errors) {
+      return Array.isArray(errorData.non_field_errors)
+        ? errorData.non_field_errors[0]
+        : errorData.non_field_errors;
+    }
+    if (errorData.detail) return errorData.detail;
+    return "";
+  };
 
-    setLoading(true);
-    setErrors({});
-    setGeneralError("");
+  // Extract field errors from response
+  const extractFieldErrors = (errorData) => {
+    const fieldErrors = {};
+
+    // Handle standardized error format
+    if (errorData.errors) {
+      Object.keys(errorData.errors).forEach((key) => {
+        fieldErrors[key] = Array.isArray(errorData.errors[key])
+          ? errorData.errors[key][0]
+          : errorData.errors[key];
+      });
+      return fieldErrors;
+    }
+
+    // Handle old format (backward compatibility)
+    Object.keys(errorData).forEach((key) => {
+      if (
+        key !== "non_field_errors" &&
+        key !== "detail" &&
+        key !== "message" &&
+        key !== "success"
+      ) {
+        fieldErrors[key] = Array.isArray(errorData[key])
+          ? errorData[key][0]
+          : errorData[key];
+      }
+    });
+
+    return fieldErrors;
+  };
+
+  // Form submission handler
+  const onSubmit = async (formData) => {
+    const { username, email, password, confirmPassword } = formData;
+
+    clearErrors();
     setSuccessMessage("");
+
     try {
       const response = await api.post("register/", {
         username,
@@ -62,7 +108,7 @@ const Register = () => {
       if (responseData.success) {
         const userEmail = responseData.data?.email || email;
 
-        // Redirect to "check your email" verification info page
+        // Redirect to verification page
         navigate("/verify-code", {
           state: {
             email: userEmail,
@@ -73,39 +119,57 @@ const Register = () => {
     } catch (err) {
       if (err.response?.data) {
         const errorData = err.response.data;
-        
-        // Handle standardized error format
-        if (errorData.success === false) {
-          // Set general error message
-          if (errorData.message) {
-            setGeneralError(errorData.message);
-          }
-          
-          // Set field-specific errors
-          if (errorData.errors) {
-            setErrors(errorData.errors);
-          }
-        } else {
-          // Handle old format (backward compatibility)
-          if (errorData.non_field_errors) {
-            const errorMsg = Array.isArray(errorData.non_field_errors) 
-              ? errorData.non_field_errors[0] 
-              : errorData.non_field_errors;
-            setGeneralError(errorMsg);
-          } else {
-            setErrors(errorData);
-            if (errorData.detail) {
-              setGeneralError(errorData.detail);
-            }
-          }
+
+        // Extract general error message
+        const generalError = extractErrorMessage(errorData);
+
+        // Extract field-specific errors
+        const fieldErrors = extractFieldErrors(errorData);
+
+        // Set errors in form
+        if (Object.keys(fieldErrors).length > 0) {
+          setServerErrors(fieldErrors);
+        }
+
+        if (generalError) {
+          setServerErrors({ general: generalError });
+        }
+
+        // If no specific errors found, set generic message
+        if (Object.keys(fieldErrors).length === 0 && !generalError) {
+          setServerErrors({
+            general: "Registration failed. Please try again.",
+          });
         }
       } else {
-        setGeneralError("Registration failed. Please try again.");
+        setServerErrors({
+          general: "Registration failed. Please try again.",
+        });
       }
-    } finally {
-      setLoading(false);
     }
   };
+
+  // Initialize form with useForm hook
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setServerErrors,
+    clearErrors,
+  } = useForm(
+    {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationRules,
+    onSubmit
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
@@ -117,90 +181,124 @@ const Register = () => {
           Create your account to get started
         </p>
 
-        <SuccessMessage 
-          message={successMessage} 
-          onDismiss={() => setSuccessMessage("")} 
+        <SuccessMessage
+          message={successMessage}
+          onDismiss={() => setSuccessMessage("")}
         />
 
-        <ErrorMessage message={generalError} />
+        <ErrorMessage message={errors.general} />
 
-        <form onSubmit={handleRegister} noValidate className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label
+              htmlFor="username"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Username
             </label>
             <input
+              id="username"
+              name="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={values.username}
+              onChange={handleChange}
+              onBlur={handleBlur}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
-              disabled={loading}
+              disabled={isSubmitting}
               placeholder="e.g. ahsanmehmood_"
+              autoComplete="username"
             />
             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
               Only letters, numbers, and @ . + - _ are allowed
             </p>
-            {errors.username && (
-              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">{errors.username}</p>
+            {touched.username && errors.username && (
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">
+                {errors.username}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Email
             </label>
             <input
+              id="email"
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
-              disabled={loading}
+              disabled={isSubmitting}
               placeholder="example@email.com"
+              autoComplete="email"
             />
             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
               Enter a valid email address
             </p>
-            {errors.email && (
-              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">{errors.email}</p>
+            {touched.email && errors.email && (
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">
+                {errors.email}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Password
             </label>
             <input
+              id="password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
-              disabled={loading}
+              disabled={isSubmitting}
               placeholder="At least 8 characters"
+              autoComplete="new-password"
             />
             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
               Must be at least 8 characters
             </p>
-            {errors.password && (
-              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">{errors.password}</p>
+            {touched.password && errors.password && (
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">
+                {errors.password}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label
+              htmlFor="confirmPassword"
+              className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Confirm Password
             </label>
             <input
+              id="confirmPassword"
+              name="confirmPassword"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={values.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
-              disabled={loading}
+              disabled={isSubmitting}
               placeholder="Repeat your password"
+              autoComplete="new-password"
             />
             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
               Must match the password above
             </p>
-            {errors.confirmPassword && (
+            {touched.confirmPassword && errors.confirmPassword && (
               <p className="text-red-600 dark:text-red-400 text-sm mt-1.5">
                 {errors.confirmPassword}
               </p>
@@ -209,12 +307,15 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg flex justify-center items-center"
+            disabled={isSubmitting}
+            className={`w-full bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg flex justify-center items-center ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            {loading ? (
-              <Box sx={{ display: "flex" }}>
-                <CircularProgress size={24} color="inherit" />
+            {isSubmitting ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={20} color="inherit" />
+                <span>Creating account...</span>
               </Box>
             ) : (
               "Create account"
@@ -224,7 +325,10 @@ const Register = () => {
 
         <p className="text-center text-gray-600 dark:text-gray-400 mt-6 text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-primary hover:text-primaryHover font-medium hover:underline transition">
+          <Link
+            to="/login"
+            className="text-primary hover:text-primaryHover font-medium hover:underline transition"
+          >
             Sign in
           </Link>
         </p>
