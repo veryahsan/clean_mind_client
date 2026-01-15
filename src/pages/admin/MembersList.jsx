@@ -5,6 +5,13 @@ import adminApi from "../../services/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import SuccessMessage from "../../components/common/SuccessMessage";
+import StatusCapsule from "../../components/common/StatusCapsule";
+import {
+  PersonAdd,
+  MoreVert,
+  Edit,
+  Delete,
+} from "@mui/icons-material";
 
 const MembersList = () => {
   const navigate = useNavigate();
@@ -107,6 +114,21 @@ const MembersList = () => {
     setOpenMenuId(openMenuId === memberId ? null : memberId);
   };
 
+  const getVerificationStatus = (member) => {
+    // Check if account is fully verified and active
+    if (member.is_active && member.email_verified_at) {
+      return { label: 'Verified & Active', variant: 'success' };
+    }
+    
+    // Account is active but email not verified
+    if (member.is_active && !member.email_verified_at) {
+      return { label: 'Pending Email Verification', variant: 'warning' };
+    }
+    
+    // Account is suspended/inactive
+    return { label: 'Suspended', variant: 'danger' };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -133,8 +155,9 @@ const MembersList = () => {
           </div>
           <Link
             to="/admin/create-member"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
           >
+            <PersonAdd className="w-5 h-5" />
             Create Member
           </Link>
         </div>
@@ -161,6 +184,9 @@ const MembersList = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Verification Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Joined
@@ -190,6 +216,12 @@ const MembersList = () => {
                           : "-"}
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        const statusInfo = getVerificationStatus(member);
+                        return <StatusCapsule label={statusInfo.label} variant={statusInfo.variant} />;
+                      })()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {member.date_joined ? new Date(member.date_joined).toLocaleDateString() : "-"}
                     </td>
@@ -204,14 +236,7 @@ const MembersList = () => {
                           className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg"
                           aria-label="Options"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
+                          <MoreVert className="w-5 h-5" />
                         </button>
                         {openMenuId === member.id && (
                           <div 
@@ -225,8 +250,9 @@ const MembersList = () => {
                                   e.stopPropagation();
                                   handleEdit(member.id);
                                 }}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                               >
+                                <Edit className="w-4 h-4" />
                                 Edit
                               </button>
                               <button
@@ -235,8 +261,9 @@ const MembersList = () => {
                                   e.stopPropagation();
                                   handleDelete(member.id);
                                 }}
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                               >
+                                <Delete className="w-4 h-4" />
                                 Delete
                               </button>
                             </div>

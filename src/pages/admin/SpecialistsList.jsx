@@ -5,6 +5,15 @@ import adminApi from "../../services/adminApi";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import SuccessMessage from "../../components/common/SuccessMessage";
+import StatusCapsule from "../../components/common/StatusCapsule";
+import {
+  PersonAdd,
+  MoreVert,
+  Edit,
+  Delete,
+  Description,
+  Add,
+} from "@mui/icons-material";
 
 const SpecialistsList = () => {
   const navigate = useNavigate();
@@ -84,17 +93,39 @@ const SpecialistsList = () => {
         const response = await adminApi.get(`specialists/${specialist.id}/documents/`);
         const data = response.data;
         if (data?.success && data.data) {
+          const documents = data.data;
+          const totalDocs = documents.length;
+          const approvedDocs = documents.filter(doc => doc.verification_status === 'approved').length;
+          const allApproved = totalDocs > 0 && approvedDocs === totalDocs;
+          
           counts[specialist.id] = {
-            count: data.data.length,
-            hasDocuments: data.data.length > 0,
-            hasVerifiedDocuments: data.data.some(doc => doc.verification_status === 'approved')
+            count: totalDocs,
+            hasDocuments: totalDocs > 0,
+            hasVerifiedDocuments: approvedDocs > 0,
+            allDocumentsApproved: allApproved,
+            approvedCount: approvedDocs,
+            totalCount: totalDocs
           };
         } else {
-          counts[specialist.id] = { count: 0, hasDocuments: false, hasVerifiedDocuments: false };
+          counts[specialist.id] = { 
+            count: 0, 
+            hasDocuments: false, 
+            hasVerifiedDocuments: false,
+            allDocumentsApproved: false,
+            approvedCount: 0,
+            totalCount: 0
+          };
         }
       } catch {
         // If error, assume no documents
-        counts[specialist.id] = { count: 0, hasDocuments: false, hasVerifiedDocuments: false };
+        counts[specialist.id] = { 
+          count: 0, 
+          hasDocuments: false, 
+          hasVerifiedDocuments: false,
+          allDocumentsApproved: false,
+          approvedCount: 0,
+          totalCount: 0
+        };
       }
     }
     setDocumentCounts(counts);
@@ -143,15 +174,37 @@ const SpecialistsList = () => {
     navigate(`/admin/specialists/${specialistId}/documents`);
   };
 
-  const getVerificationStatus = (specialistId) => {
-    const docInfo = documentCounts[specialistId];
-    if (!docInfo || !docInfo.hasDocuments) {
-      return { status: 'unverified', label: 'Unverified', color: 'text-red-600 dark:text-red-400' };
+  const getVerificationStatus = (specialist) => {
+    // Check if account is fully verified and active
+    if (specialist.is_active && specialist.email_verified_at) {
+      return { label: 'Verified & Active', variant: 'success' };
     }
-    if (docInfo.hasVerifiedDocuments) {
-      return { status: 'verified', label: 'Verified', color: 'text-green-600 dark:text-green-400' };
+    
+    // Account is active but email not verified
+    if (specialist.is_active && !specialist.email_verified_at) {
+      return { label: 'Pending Email Verification', variant: 'warning' };
     }
-    return { status: 'pending', label: 'Pending', color: 'text-yellow-600 dark:text-yellow-400' };
+    
+    // Account not active yet - check document status
+    const docInfo = documentCounts[specialist.id];
+    
+    // No documents uploaded
+    if (!docInfo || !docInfo.hasDocuments || docInfo.totalCount === 0) {
+      return { label: 'No Documents', variant: 'danger' };
+    }
+    
+    // All documents are approved - ready for account verification
+    if (docInfo.allDocumentsApproved) {
+      return { label: 'Ready to Verify', variant: 'orange' };
+    }
+    
+    // Some documents approved but not all
+    if (docInfo.hasVerifiedDocuments && docInfo.approvedCount > 0) {
+      return { label: `Pending Documents (${docInfo.approvedCount}/${docInfo.totalCount} approved)`, variant: 'warning' };
+    }
+    
+    // Documents exist but none approved yet
+    return { label: 'Pending Documents', variant: 'warning' };
   };
 
   if (loading) {
@@ -180,8 +233,9 @@ const SpecialistsList = () => {
           </div>
           <Link
             to="/admin/create-specialist"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
           >
+            <PersonAdd className="w-5 h-5" />
             Create Specialist
           </Link>
         </div>
@@ -250,12 +304,8 @@ const SpecialistsList = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {(() => {
-                        const statusInfo = getVerificationStatus(specialist.id);
-                        return (
-                          <span className={`text-sm font-medium ${statusInfo.color}`}>
-                            {statusInfo.label}
-                          </span>
-                        );
+                        const statusInfo = getVerificationStatus(specialist);
+                        return <StatusCapsule label={statusInfo.label} variant={statusInfo.variant} />;
                       })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -266,9 +316,19 @@ const SpecialistsList = () => {
                         <button
                           type="button"
                           onClick={() => handleManageDocuments(specialist.id)}
-                          className="px-3 py-1.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 rounded-lg transition"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 rounded-lg transition"
                         >
-                          {documentCounts[specialist.id]?.hasDocuments ? "📄 Update Documents" : "+ Add Documents"}
+                          {documentCounts[specialist.id]?.hasDocuments ? (
+                            <>
+                              <Description className="w-4 h-4" />
+                              Update Documents
+                            </>
+                          ) : (
+                            <>
+                              <Add className="w-4 h-4" />
+                              Add Documents
+                            </>
+                          )}
                         </button>
                         <div className="relative" ref={(el) => (menuRefs.current[specialist.id] = el)}>
                         <button
@@ -280,14 +340,7 @@ const SpecialistsList = () => {
                           className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg"
                           aria-label="Options"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
+                          <MoreVert className="w-5 h-5" />
                         </button>
                         {openMenuId === specialist.id && (
                           <div 
@@ -301,8 +354,9 @@ const SpecialistsList = () => {
                                   e.stopPropagation();
                                   handleEdit(specialist.id);
                                 }}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                               >
+                                <Edit className="w-4 h-4" />
                                 Edit
                               </button>
                               <button
@@ -311,8 +365,9 @@ const SpecialistsList = () => {
                                   e.stopPropagation();
                                   handleDelete(specialist.id);
                                 }}
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                               >
+                                <Delete className="w-4 h-4" />
                                 Delete
                               </button>
                             </div>
