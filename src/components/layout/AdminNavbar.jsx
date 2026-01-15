@@ -3,6 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useModal } from "../../context/ModalContext";
 import LogoutModal from "../../modals/LogoutModal";
+import {
+  Dashboard,
+  People,
+  MedicalServices,
+  PersonAdd,
+  Logout,
+} from "@mui/icons-material";
 
 const AdminNavbar = () => {
   const { user, logout } = useAuth();
@@ -10,11 +17,11 @@ const AdminNavbar = () => {
   const location = useLocation();
 
   const navItems = [
-    { name: "Dashboard", path: "/admin" },
-    { name: "Members", path: "/admin/members" },
-    { name: "Specialists", path: "/admin/specialists" },
-    { name: "Create Member", path: "/admin/create-member" },
-    { name: "Create Specialist", path: "/admin/create-specialist" },
+    { name: "Dashboard", path: "/admin", icon: <Dashboard className="w-4 h-4" /> },
+    { name: "Members", path: "/admin/members", icon: <People className="w-4 h-4" /> },
+    { name: "Specialists", path: "/admin/specialists", icon: <MedicalServices className="w-4 h-4" /> },
+    { name: "Create Member", path: "/admin/create-member", icon: <PersonAdd className="w-4 h-4" /> },
+    { name: "Create Specialist", path: "/admin/create-specialist", icon: <PersonAdd className="w-4 h-4" /> },
   ];
 
   const isActive = (path) => {
@@ -50,12 +57,13 @@ const AdminNavbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center gap-2 px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
                     isActive(item.path)
                       ? "border-indigo-500 text-gray-900 dark:text-white"
                       : "border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >
+                  {item.icon}
                   {item.name}
                 </Link>
               ))}
@@ -67,8 +75,9 @@ const AdminNavbar = () => {
             </span>
             <button
               onClick={handleLogoutClick}
-              className="px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
             >
+              <Logout className="w-4 h-4" />
               Logout
             </button>
           </div>
@@ -82,12 +91,13 @@ const AdminNavbar = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors ${
+              className={`flex items-center gap-2 pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors ${
                 isActive(item.path)
                   ? "bg-indigo-50 border-indigo-500 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
                   : "border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300"
               }`}
             >
+              {item.icon}
               {item.name}
             </Link>
           ))}
