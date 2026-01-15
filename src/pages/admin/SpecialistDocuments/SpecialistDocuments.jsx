@@ -6,6 +6,13 @@ import Loader from "../../../components/common/Loader";
 import ErrorMessage from "../../../components/common/ErrorMessage";
 import SuccessMessage from "../../../components/common/SuccessMessage";
 import SpecialistDocumentCard from "./components/SpecialistDocumentCard";
+import {
+  ArrowBack,
+  Add,
+  Close,
+  VerifiedUser,
+  UploadFile,
+} from "@mui/icons-material";
 
 const DOCUMENT_TYPES = [
   { value: "license", label: "Professional License" },
@@ -34,6 +41,7 @@ const SpecialistDocuments = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [formData, setFormData] = useState({
     document_type: "",
     document_file: null,
@@ -204,6 +212,53 @@ const SpecialistDocuments = () => {
     }
   };
 
+  // Check if all documents are approved
+  const areAllDocumentsApproved = () => {
+    if (documents.length === 0) return false;
+    return documents.every((doc) => doc.verification_status === "approved");
+  };
+
+  // Handle verify account
+  const handleVerifyAccount = async () => {
+    if (!areAllDocumentsApproved()) {
+      setError("All documents must be approved before verifying the account.");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to verify and activate this specialist account?")) {
+      return;
+    }
+
+    try {
+      setVerifying(true);
+      setError("");
+      setSuccess("");
+      
+      const response = await adminApi.post(`specialists/${specialistId}/verify-account/`);
+      const data = response.data;
+
+      if (data?.success) {
+        setSuccess("Specialist account verified and activated successfully!");
+        // Update specialist data immediately
+        if (data.data) {
+          setSpecialist(data.data);
+        }
+        // Refresh data after a short delay
+        setTimeout(() => {
+          fetchSpecialistAndDocuments();
+        }, 1000);
+      } else {
+        setError(data?.message || "Failed to verify specialist account");
+      }
+    } catch (err) {
+      console.error("Failed to verify account:", err);
+      const errorData = err.response?.data;
+      setError(errorData?.message || "Failed to verify specialist account. Please try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -223,9 +278,10 @@ const SpecialistDocuments = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate("/admin/specialists")}
-            className="mb-4 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            className="inline-flex items-center gap-2 mb-4 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
-            ← Back to Specialists
+            <ArrowBack className="w-4 h-4" />
+            Back to Specialists
           </button>
           <div className="flex items-center justify-between">
             <div>
@@ -244,9 +300,10 @@ const SpecialistDocuments = () => {
             {!showAddForm && (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
               >
-                + Add Document
+                <Add className="w-5 h-5" />
+                Add Document
               </button>
             )}
           </div>
@@ -271,7 +328,7 @@ const SpecialistDocuments = () => {
                 }}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                ✕
+                <Close className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -344,9 +401,16 @@ const SpecialistDocuments = () => {
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {uploading ? <Loader fullScreen={false} size={20} /> : "Upload Document"}
+                  {uploading ? (
+                    <Loader fullScreen={false} size={20} />
+                  ) : (
+                    <>
+                      <UploadFile className="w-5 h-5" />
+                      Upload Document
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"
@@ -366,7 +430,7 @@ const SpecialistDocuments = () => {
         )}
 
         {/* Documents List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 mb-6">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Documents ({documents.length})
@@ -391,6 +455,52 @@ const SpecialistDocuments = () => {
             </div>
           )}
         </div>
+
+        {/* Verify Account Button - Only show if account is not yet verified */}
+        {documents.length > 0 && specialist && !specialist.is_active && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Account Verification
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {areAllDocumentsApproved() ? (
+                    <span className="text-green-600 dark:text-green-400">
+                      ✓ All documents are approved. You can now verify and activate the specialist account.
+                    </span>
+                  ) : (
+                    <span>
+                      {documents.filter((d) => d.verification_status === "approved").length} of {documents.length} documents approved. 
+                      All documents must be approved before verifying the account.
+                    </span>
+                  )}
+                </p>
+              </div>
+              <button
+                onClick={handleVerifyAccount}
+                disabled={!areAllDocumentsApproved() || verifying}
+                className={`inline-flex items-center gap-2 px-6 py-3 font-medium rounded-lg transition ${
+                  !areAllDocumentsApproved()
+                    ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 text-white"
+                }`}
+              >
+                {verifying ? (
+                  <>
+                    <Loader fullScreen={false} size={20} />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <VerifiedUser className="w-5 h-5" />
+                    Verify Account
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
