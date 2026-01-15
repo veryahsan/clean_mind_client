@@ -31,6 +31,7 @@ import CreateSpecialistAdmin from "../pages/admin/CreateSpecialist";
 import EditMember from "../pages/admin/EditMember";
 import EditSpecialist from "../pages/admin/EditSpecialist";
 import AdminVerifyLogin from "../pages/admin/AdminVerifyLogin";
+import SpecialistDocuments from "../pages/admin/SpecialistDocuments/SpecialistDocuments";
 
 const AppRoutes = () => {
   return (
@@ -137,6 +138,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requireAdmin={true}>
             <EditSpecialist />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/specialists/:specialistId/documents"
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <SpecialistDocuments />
           </ProtectedRoute>
         }
       />
