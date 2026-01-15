@@ -5,7 +5,6 @@ import adminApi from "../../../services/adminApi";
 import Loader from "../../../components/common/Loader";
 import ErrorMessage from "../../../components/common/ErrorMessage";
 import SuccessMessage from "../../../components/common/SuccessMessage";
-import { useCard } from "../../../context/CardContext";
 import SpecialistDocumentCard from "./components/SpecialistDocumentCard";
 
 const DOCUMENT_TYPES = [
@@ -28,7 +27,6 @@ const VERIFICATION_STATUS_OPTIONS = [
 const SpecialistDocuments = () => {
   const navigate = useNavigate();
   const { specialistId } = useParams();
-  const { Card, CardHeader, CardBody, EmptyState } = useCard();
   const [specialist, setSpecialist] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -369,9 +367,17 @@ const SpecialistDocuments = () => {
 
         {/* Documents List */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
-          <CardHeader title={`Documents (${documents.length})`} />
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Documents ({documents.length})
+            </h2>
+          </div>
           {documents.length === 0 ? (
-            <EmptyState message="No documents uploaded yet. Click '+ Add Document' to upload verification documents." />
+            <div className="p-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400">
+                No documents uploaded yet. Click '+ Add Document' to upload verification documents.
+              </p>
+            </div>
           ) : (
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {documents.map((doc) => (
