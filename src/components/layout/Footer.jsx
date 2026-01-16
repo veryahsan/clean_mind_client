@@ -13,135 +13,40 @@ const Footer = () => {
     return null;
   }
 
-  // Full footer for non-authenticated users
-
   return (
-    <footer className="w-full bg-white dark:bg-gray-800">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 gap-y-8 md:gap-8 py-10 max-w-sm mx-auto sm:max-w-3xl lg:max-w-full">
-          <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0 text-center lg:text-left">
-            <a
-              href="#"
-              className="flex justify-center lg:justify-start font-medium"
-            >
-              <img src={Logo} alt="CleanMind Logo" className="h-24 w-auto" />
-            </a>
-
-            <p className="py-4 text-sm text-gray-500">
-              Trusted in more than 100 countries & 5 million customers. Have any
-              query?
-            </p>
-
-            <button
-              onClick={() => openModal(<ContactModal />)}
-              className="py-2.5 px-5 h-9 inline-block bg-indigo-600 rounded-full shadow-sm text-xs text-white transition-all duration-500 hover:bg-indigo-700"
-            >
-              Contact us
-            </button>
-          </div>
-
-          <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">
-              CleanMind
-            </h4>
-            <ul className="text-sm">
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Home
-                </a>
-              </li>
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Pricing
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">
-              Follow Us
-            </h4>
-            <ul className="text-sm">
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Instagram
-                </a>
-              </li>
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Facebook
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Twitter
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">Support</h4>
-            <ul className="text-sm">
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Customer Support
-                </a>
-              </li>
-              <li className="mb-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Terms & Conditions
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  Privacy Policy
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-left">
-            <h4 className="text-lg text-gray-900 font-medium mb-7">
-              Subscribe
-            </h4>
-            <p className="text-sm text-gray-500 leading-6 mb-7">
-              Subscribe to get the latest news from us
-            </p>
-            <a
-              href="#"
-              className="flex items-center justify-center gap-2 border border-blue-50 rounded-full py-3 px-6 w-fit text-sm text-indigo-600 font-semibold transition-all duration-500 hover:bg-indigo-50"
-            >
-              Subscribe
-              <svg
-                width="15"
-                height="12"
-                viewBox="0 0 15 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+    <footer className="w-full bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* Left side - Logo and Links */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+            <img src={Logo} alt="CleanMind Logo" className="h-8 w-auto opacity-60" />
+            
+            <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+              <button
+                onClick={() => openModal(<ContactModal />)}
+                className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
               >
-                <path
-                  d="M1.25 6L13.25 6M9.5 10.5L13.4697 6.53033C13.7197 6.28033 13.8447 6.15533 13.8447 6C13.8447 5.84467 13.7197 5.71967 13.4697 5.46967L9.5 1.5"
-                  stroke="#4F46E5"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
+                Contact
+              </button>
+              <a
+                href="#"
+                className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+              >
+                Privacy
+              </a>
+              <a
+                href="#"
+                className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+              >
+                Terms
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div className="py-7 border-t border-gray-200 flex flex-col lg:flex-row items-center justify-center lg:justify-between">
-          <span className="text-sm text-gray-500 mb-4 lg:mb-0">
-            © <a href="#">CleanMind</a> 2026, All rights reserved.
-          </span>
+          {/* Right side - Copyright */}
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            © {new Date().getFullYear()} CleanMind. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
