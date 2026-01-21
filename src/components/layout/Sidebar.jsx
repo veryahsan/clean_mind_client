@@ -287,9 +287,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                 </ul>
               </div>
             </div>
-
-            {/* Footer at bottom of sidebar */}
-            <AuthenticatedFooter />
           </div>
         </div>
 
@@ -324,4 +321,3 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
 };
 
 export default Sidebar;
-

@@ -21,6 +21,8 @@ import Messages from "../pages/messages/Messages";
 import Assistant from "../pages/assistant/Assistant";
 import Notifications from "../pages/notifications/Notifications";
 import Profile from "../pages/profile/Profile";
+import Appointments from "../pages/appointments/Appointments";
+import ExploreDoctors from "../pages/explore-doctors/ExploreDoctors";
 
 // Admin Pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -196,6 +198,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/appointments"
+        element={
+          <ProtectedRoute>
+            <Appointments />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/explore-doctors"
+        element={
+          <ProtectedRoute>
+            <ExploreDoctors />
           </ProtectedRoute>
         }
       />
