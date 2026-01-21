@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useModal } from "../../context/ModalContext";
@@ -22,12 +22,43 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const sidebarRef = useRef(null);
   const resizeHandleRef = useRef(null);
   
-  // Track which sections are expanded (default: all expanded)
-  const [expandedSections, setExpandedSections] = useState(() => {
+  // Track user's manual expand/collapse preferences
+  const [userExpandedSections, setUserExpandedSections] = useState(() => {
     const defaultExpanded = new Set(menuSections.map(section => section.id));
     defaultExpanded.add('general');
     return defaultExpanded;
   });
+
+  // Compute which sections should be expanded based on route
+  const routeBasedExpanded = useMemo(() => {
+    const activePath = location.pathname;
+    const expanded = new Set();
+    
+    // Check menu sections
+    menuSections.forEach(section => {
+      const hasActiveItem = section.items.some(item => item.path === activePath);
+      if (hasActiveItem) {
+        expanded.add(section.id);
+      }
+    });
+
+    // Check general menu items
+    const hasActiveGeneralItem = generalMenuItems.some(item => item.path === activePath);
+    if (hasActiveGeneralItem) {
+      expanded.add('general');
+    }
+    
+    return expanded;
+  }, [location.pathname]);
+
+  // Merge route-based expansion with user preferences
+  const expandedSections = useMemo(() => {
+    const merged = new Set(userExpandedSections);
+    // Always include sections that contain the active route
+    routeBasedExpanded.forEach(sectionId => merged.add(sectionId));
+    return merged;
+  }, [userExpandedSections, routeBasedExpanded]);
+
   const handleLogoutConfirm = () => {
     logout();
     setTimeout(() => {
@@ -103,48 +134,25 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     };
   }, [isResizing, setSidebarWidth]);
 
-  // Toggle section expand/collapse
+  // Toggle section expand/collapse (only affects user preferences, not route-based expansion)
   const toggleSection = useCallback((sectionId) => {
-    setExpandedSections(prev => {
+    setUserExpandedSections(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(sectionId)) {
-        newSet.delete(sectionId);
-      } else {
+      // Don't allow collapsing if this section contains the active route
+      if (routeBasedExpanded.has(sectionId)) {
+        // If route-based, just ensure it's in user preferences for when route changes
         newSet.add(sectionId);
+      } else {
+        // Toggle user preference
+        if (newSet.has(sectionId)) {
+          newSet.delete(sectionId);
+        } else {
+          newSet.add(sectionId);
+        }
       }
       return newSet;
     });
-  }, []);
-
-  // Auto-expand section if it contains the active route
-  useEffect(() => {
-    const activePath = location.pathname;
-    
-    // Sync expanded sections with active route - this is intentional UI state sync
-    // eslint-disable-next-line react-compiler/react-compiler
-    setExpandedSections(prev => {
-      const newSet = new Set(prev);
-      let hasChanges = false;
-      
-      // Check menu sections
-      menuSections.forEach(section => {
-        const hasActiveItem = section.items.some(item => item.path === activePath);
-        if (hasActiveItem && !newSet.has(section.id)) {
-          newSet.add(section.id);
-          hasChanges = true;
-        }
-      });
-
-      // Check general menu items
-      const hasActiveGeneralItem = generalMenuItems.some(item => item.path === activePath);
-      if (hasActiveGeneralItem && !newSet.has('general')) {
-        newSet.add('general');
-        hasChanges = true;
-      }
-      
-      return hasChanges ? newSet : prev;
-    });
-  }, [location.pathname]);
+  }, [routeBasedExpanded]);
 
   // Only show sidebar when authenticated
   if (!isAuthenticated) return null;
