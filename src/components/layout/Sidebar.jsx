@@ -21,7 +21,13 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const sidebarRef = useRef(null);
   const resizeHandleRef = useRef(null);
-
+  
+  // Track which sections are expanded (default: all expanded)
+  const [expandedSections, setExpandedSections] = useState(() => {
+    const defaultExpanded = new Set(menuSections.map(section => section.id));
+    defaultExpanded.add('general');
+    return defaultExpanded;
+  });
   const handleLogoutConfirm = () => {
     logout();
     setTimeout(() => {
@@ -96,6 +102,49 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       document.body.style.userSelect = "";
     };
   }, [isResizing, setSidebarWidth]);
+
+  // Toggle section expand/collapse
+  const toggleSection = useCallback((sectionId) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Auto-expand section if it contains the active route
+  useEffect(() => {
+    const activePath = location.pathname;
+    
+    // Sync expanded sections with active route - this is intentional UI state sync
+    // eslint-disable-next-line react-compiler/react-compiler
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      let hasChanges = false;
+      
+      // Check menu sections
+      menuSections.forEach(section => {
+        const hasActiveItem = section.items.some(item => item.path === activePath);
+        if (hasActiveItem && !newSet.has(section.id)) {
+          newSet.add(section.id);
+          hasChanges = true;
+        }
+      });
+
+      // Check general menu items
+      const hasActiveGeneralItem = generalMenuItems.some(item => item.path === activePath);
+      if (hasActiveGeneralItem && !newSet.has('general')) {
+        newSet.add('general');
+        hasChanges = true;
+      }
+      
+      return hasChanges ? newSet : prev;
+    });
+  }, [location.pathname]);
 
   // Only show sidebar when authenticated
   if (!isAuthenticated) return null;
@@ -174,34 +223,61 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           {/* Body */}
           <nav className="flex-1 overflow-y-auto py-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-300/60 hover:[&::-webkit-scrollbar-thumb]:bg-indigo-400/80 dark:[&::-webkit-scrollbar-thumb]:bg-indigo-600/40 dark:hover:[&::-webkit-scrollbar-thumb]:bg-indigo-500/60 transition-colors">
             <div className="pb-0 px-3 w-full flex flex-col flex-wrap">
-              {menuSections.map((section) => (
-                <div key={section.id} className="mb-6">
-                  <h3 className="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {section.title}
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {section.items.map((item) => {
-                      const active = isActive(item.path);
-                      return (
-                        <li key={item.id}>
-                          <Link
-                            to={item.path}
-                            onClick={onClose}
-                            className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                              active
-                                ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                            }`}
-                          >
-                            <span>{item.icon}</span>
-                            <span>{item.name}</span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
+              {menuSections.map((section) => {
+                const isExpanded = expandedSections.has(section.id);
+                return (
+                  <div key={section.id} className="mb-6">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.id)}
+                      className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150"
+                    >
+                      <span>{section.title}</span>
+                      <svg
+                        className={`size-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <ul className="space-y-1.5">
+                        {section.items.map((item) => {
+                          const active = isActive(item.path);
+                          return (
+                            <li key={item.id}>
+                              <Link
+                                to={item.path}
+                                onClick={onClose}
+                                className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                                  active
+                                    ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                                }`}
+                              >
+                                <span>{item.icon}</span>
+                                <span>{item.name}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </nav>
           {/* End Body */}
@@ -236,55 +312,79 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
 
               {/* General Menu Section */}
               <div className="mb-4">
-                <h3 className="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  General
-                </h3>
-                <ul className="space-y-1.5">
-                  {generalMenuItems.map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                      <li key={item.id}>
-                        <Link
-                          to={item.path}
-                          onClick={onClose}
-                          className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                            active
-                              ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                          }`}
-                        >
-                          <span>{item.icon}</span>
-                          <span>{item.name}</span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                  <li>
-                    <button
-                      type="button"
-                      onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                    >
-                      <svg
-                        className="size-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                <button
+                  type="button"
+                  onClick={() => toggleSection('general')}
+                  className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150"
+                >
+                  <span>General</span>
+                  <svg
+                    className={`size-4 transition-transform duration-200 ${expandedSections.has('general') ? 'rotate-180' : ''}`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    expandedSections.has('general') ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <ul className="space-y-1.5">
+                    {generalMenuItems.map((item) => {
+                      const active = isActive(item.path);
+                      return (
+                        <li key={item.id}>
+                          <Link
+                            to={item.path}
+                            onClick={onClose}
+                            className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                              active
+                                ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                            }`}
+                          >
+                            <span>{item.icon}</span>
+                            <span>{item.name}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                    <li>
+                      <button
+                        type="button"
+                        onClick={handleLogoutClick}
+                        className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                       >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" x2="9" y1="12" y2="12" />
-                      </svg>
-                      Sign out
-                    </button>
-                  </li>
-                </ul>
+                        <svg
+                          className="size-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                          <polyline points="16 17 21 12 16 7" />
+                          <line x1="21" x2="9" y1="12" y2="12" />
+                        </svg>
+                        Sign out
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
