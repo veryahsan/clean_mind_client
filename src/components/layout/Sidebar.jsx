@@ -6,6 +6,7 @@ import UserAvatar from "../layout/UserAvatar";
 import Logo from "../../assets/logo.png";
 import LogoutModal from "../../modals/LogoutModal";
 import AuthenticatedFooter from "./AuthenticatedFooter";
+import { menuSections, generalMenuItems } from "./sidebarMenuItems.jsx";
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const MIN_SIDEBAR_WIDTH = 200;
@@ -103,121 +104,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     return location.pathname === path;
   };
 
-  const menuItems = [
-    {
-      id: "dashboard",
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: (
-        <svg
-          className="size-5"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-      ),
-    },
-    {
-      id: "calendar",
-      name: "Calendar",
-      path: "/calendar",
-      icon: (
-        <svg
-          className="size-5"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-          <line x1="16" x2="16" y1="2" y2="6" />
-          <line x1="8" x2="8" y1="2" y2="6" />
-          <line x1="3" x2="21" y1="10" y2="10" />
-        </svg>
-      ),
-    },
-    {
-      id: "messages",
-      name: "Messages",
-      path: "/messages",
-      icon: (
-        <svg
-          className="size-5"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          <path d="M13 8H8" />
-          <path d="M17 12H8" />
-        </svg>
-      ),
-    },
-    {
-      id: "notifications",
-      name: "Notifications",
-      path: "/notifications",
-      icon: (
-        <svg
-          className="size-5"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-        </svg>
-      ),
-    },
-    {
-      id: "assistant",
-      name: "Personal Assistant",
-      path: "/assistant",
-      icon: (
-        <svg
-          className="size-5"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 3v3m0 12v3m9-9h-3m-12 0H3m15.364-6.364l-2.121 2.121M6.757 17.243l-2.121 2.121m14.142 0l-2.121-2.121M6.757 6.757L4.636 4.636" />
-          <circle cx="12" cy="12" r="2" />
-        </svg>
-      ),
-    },
-  ];
-
   return (
     <>
       {/* Overlay for mobile only */}
@@ -288,28 +174,34 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
           {/* Body */}
           <nav className="flex-1 overflow-y-auto py-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-300/60 hover:[&::-webkit-scrollbar-thumb]:bg-indigo-400/80 dark:[&::-webkit-scrollbar-thumb]:bg-indigo-600/40 dark:hover:[&::-webkit-scrollbar-thumb]:bg-indigo-500/60 transition-colors">
             <div className="pb-0 px-3 w-full flex flex-col flex-wrap">
-              <ul className="space-y-1.5">
-                {menuItems.map((item) => {
-                  const active = isActive(item.path);
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        to={item.path}
-                        onClick={onClose}
-                        className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                          active
-                            ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                        }`}
-                      >
-                        <span>{item.icon}</span>
-                        <span>{item.name}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-
+              {menuSections.map((section) => (
+                <div key={section.id} className="mb-6">
+                  <h3 className="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {section.title}
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {section.items.map((item) => {
+                      const active = isActive(item.path);
+                      return (
+                        <li key={item.id}>
+                          <Link
+                            to={item.path}
+                            onClick={onClose}
+                            className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                              active
+                                ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                            }`}
+                          >
+                            <span>{item.icon}</span>
+                            <span>{item.name}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
             </div>
           </nav>
           {/* End Body */}
@@ -342,92 +234,58 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
                 </div>
               </div>
 
-              {/* Profile Menu Links */}
-              <ul className="space-y-1.5">
-                <li>
-                  <Link
-                    to="/profile"
-                    onClick={onClose}
-                    className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                      isActive("/profile")
-                        ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                    }`}
-                  >
-                    <svg
-                      className="size-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+              {/* General Menu Section */}
+              <div className="mb-4">
+                <h3 className="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  General
+                </h3>
+                <ul className="space-y-1.5">
+                  {generalMenuItems.map((item) => {
+                    const active = isActive(item.path);
+                    return (
+                      <li key={item.id}>
+                        <Link
+                          to={item.path}
+                          onClick={onClose}
+                          className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
+                            active
+                              ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                          }`}
+                        >
+                          <span>{item.icon}</span>
+                          <span>{item.name}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                  <li>
+                    <button
+                      type="button"
+                      onClick={handleLogoutClick}
+                      className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                     >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
-                    Profile
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    to="/settings"
-                    onClick={onClose}
-                    className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                      isActive("/settings")
-                        ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                    }`}
-                  >
-                    <svg
-                      className="size-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
-                    </svg>
-                    Settings
-                  </Link>
-                </li>
-
-                <li>
-                  <button
-                    type="button"
-                    onClick={handleLogoutClick}
-                    className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                  >
-                    <svg
-                      className="size-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" x2="9" y1="12" y2="12" />
-                    </svg>
-                    Sign out
-                  </button>
-                </li>
-              </ul>
+                      <svg
+                        className="size-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" x2="9" y1="12" y2="12" />
+                      </svg>
+                      Sign out
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* Footer at bottom of sidebar */}
