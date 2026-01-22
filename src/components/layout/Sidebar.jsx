@@ -17,56 +17,232 @@ import { menuSections, generalMenuItems } from "./sidebarMenuItems.jsx";
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 500;
-const DEFAULT_SIDEBAR_WIDTH = 256; // w-64 = 256px
+const DEFAULT_SIDEBAR_WIDTH = 256;
+const COLLAPSE_THRESHOLD = 220; // Width below which sidebar shows only icons
+const COLLAPSED_WIDTH = 80; // Width when showing only icons
+const DEFAULT_EXPANDED_SECTIONS = new Set(menuSections.map((s) => s.id));
+
+const MenuItem = ({ item, isActive, isCollapsed, onClose }) => (
+  <Link
+    to={item.path}
+    onClick={onClose}
+    className={`flex items-center ${
+      isCollapsed ? "justify-center" : "gap-x-2"
+    } py-2.5 ${
+      isCollapsed ? "px-2" : "px-3"
+    } text-sm font-medium rounded-xl transition-colors duration-150 ${
+      isActive
+        ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
+        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+    }`}
+    title={isCollapsed ? item.name : undefined}
+  >
+    <span className={isCollapsed ? "text-xl" : ""}>{item.icon}</span>
+    {!isCollapsed && <span>{item.name}</span>}
+  </Link>
+);
+
+const CollapsedProfile = ({
+  user,
+  generalMenuItems,
+  isActive,
+  onClose,
+  handleLogoutClick,
+}) => (
+  <div className="flex flex-col items-center gap-4">
+    <div className="relative">
+      <UserAvatar
+        username={user?.username}
+        headshot={user?.headshot}
+        has_headshot={user?.has_headshot}
+        size={44}
+      />
+      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
+    </div>
+
+    <ul className="space-y-2 w-full">
+      {generalMenuItems.map((item) => (
+        <li key={item.id}>
+          <MenuItem
+            item={item}
+            isActive={isActive(item.path)}
+            isCollapsed={true}
+            onClose={onClose}
+          />
+        </li>
+      ))}
+      <li>
+        <button
+          type="button"
+          onClick={handleLogoutClick}
+          className="w-full flex items-center justify-center py-2.5 px-2 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+          title="Sign out"
+        >
+          <svg
+            className="size-5"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" x2="9" y1="12" y2="12" />
+          </svg>
+        </button>
+      </li>
+    </ul>
+  </div>
+);
+
+const ExpandedProfile = ({
+  user,
+  generalMenuItems,
+  expandedSections,
+  toggleSection,
+  isActive,
+  onClose,
+  handleLogoutClick,
+}) => (
+  <>
+    <button
+      type="button"
+      onClick={() => toggleSection("general")}
+      className="w-full flex items-center justify-between gap-3 mb-4 hover:bg-gray-50 dark:hover:bg-neutral-800/50 rounded-lg p-2 -m-2 transition-colors duration-150"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="relative flex-shrink-0">
+          <UserAvatar
+            username={user?.username}
+            headshot={user?.headshot}
+            has_headshot={user?.has_headshot}
+            size={44}
+          />
+          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate text-left">
+            {user?.first_name && user?.last_name
+              ? `${user.first_name} ${user.last_name}`
+              : user?.username || "User"}
+          </p>
+          {user?.email && (
+            <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-0.5 text-left">
+              {user.email}
+            </p>
+          )}
+        </div>
+      </div>
+      <svg
+        className={`size-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${
+          expandedSections.has("general") ? "rotate-180" : ""
+        }`}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </button>
+
+    <div
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+        expandedSections.has("general")
+          ? "max-h-96 opacity-100"
+          : "max-h-0 opacity-0"
+      }`}
+    >
+      <ul className="space-y-1.5">
+        {generalMenuItems.map((item) => (
+          <li key={item.id}>
+            <MenuItem
+              item={item}
+              isActive={isActive(item.path)}
+              isCollapsed={false}
+              onClose={onClose}
+            />
+          </li>
+        ))}
+        <li>
+          <button
+            type="button"
+            onClick={handleLogoutClick}
+            className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+          >
+            <svg
+              className="size-5"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            Sign out
+          </button>
+        </li>
+      </ul>
+    </div>
+  </>
+);
 
 const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useModal();
   const [isResizing, setIsResizing] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [tempWidth, setTempWidth] = useState(null);
   const sidebarRef = useRef(null);
   const resizeHandleRef = useRef(null);
+  const [isDesktop, setIsDesktop] = useState(
+    () => window.matchMedia("(min-width: 1024px)").matches
+  );
+
+  // Determine if sidebar should show in collapsed/icon-only mode
+  const isCollapsed = useMemo(() => {
+    return isDesktop && sidebarWidth < COLLAPSE_THRESHOLD;
+  }, [isDesktop, sidebarWidth]);
 
   // Track user's manual expand/collapse preferences
-  const [userExpandedSections, setUserExpandedSections] = useState(() => {
-    const defaultExpanded = new Set(menuSections.map((section) => section.id));
-    return defaultExpanded;
-  });
-
-  // Compute which sections should be expanded based on route
-  const routeBasedExpanded = useMemo(() => {
-    const activePath = location.pathname;
-    const expanded = new Set();
-
-    // Check menu sections
-    menuSections.forEach((section) => {
-      const hasActiveItem = section.items.some(
-        (item) => item.path === activePath
-      );
-      if (hasActiveItem) {
-        expanded.add(section.id);
-      }
-    });
-
-    // Check general menu items
-    const hasActiveGeneralItem = generalMenuItems.some(
-      (item) => item.path === activePath
-    );
-    if (hasActiveGeneralItem) {
-      expanded.add("general");
-    }
-
-    return expanded;
-  }, [location.pathname]);
+  const [userExpandedSections, setUserExpandedSections] = useState(
+    () => DEFAULT_EXPANDED_SECTIONS
+  );
 
   // Merge route-based expansion with user preferences
   const expandedSections = useMemo(() => {
     const merged = new Set(userExpandedSections);
-    // Always include sections that contain the active route
-    routeBasedExpanded.forEach((sectionId) => merged.add(sectionId));
+    const activePath = location.pathname;
+
+    menuSections.forEach((section) => {
+      if (section.items.some((item) => item.path === activePath)) {
+        merged.add(section.id);
+      }
+    });
+
+    if (generalMenuItems.some((item) => item.path === activePath)) {
+      merged.add("general");
+    }
+
     return merged;
-  }, [userExpandedSections, routeBasedExpanded]);
+  }, [userExpandedSections, location.pathname]);
 
   const handleLogoutConfirm = () => {
     logout();
@@ -80,15 +256,21 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
     openModal(<LogoutModal onConfirm={handleLogoutConfirm} />);
   };
 
+  // Handle expand button click when collapsed
+  const handleExpandClick = useCallback(() => {
+    if (isCollapsed) {
+      setSidebarWidth(DEFAULT_SIDEBAR_WIDTH);
+      localStorage.setItem(SIDEBAR_WIDTH_KEY, DEFAULT_SIDEBAR_WIDTH.toString());
+    }
+  }, [isCollapsed, setSidebarWidth]);
+
   // Check if we're on desktop
   useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handler = (e) => setIsDesktop(e.matches);
 
-    checkDesktop();
-    window.addEventListener("resize", checkDesktop);
-    return () => window.removeEventListener("resize", checkDesktop);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
   // Initialize sidebar width from localStorage
@@ -116,16 +298,29 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       if (!isResizing) return;
 
       const newWidth = e.clientX;
-      const clampedWidth = Math.max(
-        MIN_SIDEBAR_WIDTH,
-        Math.min(MAX_SIDEBAR_WIDTH, newWidth)
-      );
+
+      // Snap to collapsed width if dragging below threshold
+      let clampedWidth;
+      if (newWidth < COLLAPSE_THRESHOLD) {
+        clampedWidth = COLLAPSED_WIDTH;
+      } else {
+        clampedWidth = Math.max(
+          MIN_SIDEBAR_WIDTH,
+          Math.min(MAX_SIDEBAR_WIDTH, newWidth)
+        );
+      }
+
       setSidebarWidth(clampedWidth);
-      localStorage.setItem(SIDEBAR_WIDTH_KEY, clampedWidth.toString());
+      setTempWidth(clampedWidth);
     };
 
     const handleMouseUp = () => {
       setIsResizing(false);
+      // Only save to localStorage on mouse up
+      if (tempWidth !== null) {
+        localStorage.setItem(SIDEBAR_WIDTH_KEY, tempWidth.toString());
+        setTempWidth(null);
+      }
     };
 
     if (isResizing) {
@@ -141,16 +336,33 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
-  }, [isResizing, setSidebarWidth]);
+  }, [isResizing, setSidebarWidth, tempWidth]);
 
-  // Toggle section expand/collapse (only affects user preferences, not route-based expansion)
+  // Toggle section expand/collapse
   const toggleSection = useCallback(
     (sectionId) => {
+      if (isCollapsed) return;
+
       setUserExpandedSections((prev) => {
         const newSet = new Set(prev);
+
+        // Check if this section contains the active route
+        const activePath = location.pathname;
+        let hasActiveRoute = false;
+
+        if (sectionId === "general") {
+          hasActiveRoute = generalMenuItems.some(
+            (item) => item.path === activePath
+          );
+        } else {
+          const section = menuSections.find((s) => s.id === sectionId);
+          hasActiveRoute = section?.items.some(
+            (item) => item.path === activePath
+          );
+        }
+
         // Don't allow collapsing if this section contains the active route
-        if (routeBasedExpanded.has(sectionId)) {
-          // If route-based, just ensure it's in user preferences for when route changes
+        if (hasActiveRoute) {
           newSet.add(sectionId);
         } else {
           // Toggle user preference
@@ -163,7 +375,7 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
         return newSet;
       });
     },
-    [routeBasedExpanded]
+    [isCollapsed, location.pathname]
   );
 
   // Only show sidebar when authenticated
@@ -203,102 +415,111 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
       >
         <div className="relative flex flex-col h-full max-h-full">
           {/* Header */}
-          <header className="p-4 flex justify-between items-center gap-x-2 border-b border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-r from-indigo-50/30 to-transparent dark:from-indigo-900/10">
+          <header
+            className={`p-4 flex ${
+              isCollapsed ? "justify-center" : "justify-between"
+            } items-center gap-x-2 border-b border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-r from-indigo-50/30 to-transparent dark:from-indigo-900/10`}
+          >
             <Link
               to="/dashboard"
-              className="flex-none font-semibold text-xl text-gray-900 focus:outline-none focus:opacity-80 dark:text-white flex items-center gap-2.5"
+              className={`flex-none font-semibold text-xl text-gray-900 focus:outline-none focus:opacity-80 dark:text-white flex items-center ${
+                isCollapsed ? "gap-0" : "gap-2.5"
+              }`}
               aria-label="Brand"
               onClick={onClose}
             >
               <img src={Logo} alt="CleanMind Logo" className="h-8 w-auto" />
-              <span>CleanMind</span>
+              {!isCollapsed && <span>CleanMind</span>}
             </Link>
 
-            <div className="lg:hidden -me-2">
-              {/* Close Button */}
-              <button
-                type="button"
-                className="flex justify-center items-center gap-x-3 size-8 bg-white/80 backdrop-blur-sm border border-gray-200/60 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-gray-500/20 transition-colors duration-150 dark:bg-neutral-700/80 dark:border-neutral-600 dark:text-neutral-400 dark:hover:bg-neutral-600"
-                onClick={onClose}
-              >
-                <svg
-                  className="shrink-0 size-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            {!isCollapsed && (
+              <div className="lg:hidden -me-2">
+                <button
+                  type="button"
+                  className="flex justify-center items-center gap-x-3 size-8 bg-white/80 backdrop-blur-sm border border-gray-200/60 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-gray-500/20 transition-colors duration-150 dark:bg-neutral-700/80 dark:border-neutral-600 dark:text-neutral-400 dark:hover:bg-neutral-600"
+                  onClick={onClose}
                 >
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
-                <span className="sr-only">Close</span>
-              </button>
-            </div>
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                  <span className="sr-only">Close</span>
+                </button>
+              </div>
+            )}
           </header>
-          {/* End Header */}
 
           {/* Body */}
           <nav className="flex-1 overflow-y-auto py-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-300/60 hover:[&::-webkit-scrollbar-thumb]:bg-indigo-400/80 dark:[&::-webkit-scrollbar-thumb]:bg-indigo-600/40 dark:hover:[&::-webkit-scrollbar-thumb]:bg-indigo-500/60 transition-colors">
-            <div className="pb-0 px-3 w-full flex flex-col flex-wrap">
+            <div
+              className={`pb-0 ${
+                isCollapsed ? "px-2" : "px-3"
+              } w-full flex flex-col flex-wrap`}
+            >
               {menuSections.map((section) => {
                 const isExpanded = expandedSections.has(section.id);
                 return (
                   <div key={section.id} className="mb-6">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection(section.id)}
-                      className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150"
-                    >
-                      <span>{section.title}</span>
-                      <svg
-                        className={`size-4 transition-transform duration-200 ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    {!isCollapsed && (
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(section.id)}
+                        className="w-full flex items-center justify-between px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150"
                       >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </button>
+                        <span>{section.title}</span>
+                        <svg
+                          className={`size-4 transition-transform duration-200 ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+                    )}
                     <div
                       className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        isExpanded
+                        !isCollapsed && isExpanded
                           ? "max-h-96 opacity-100"
+                          : isCollapsed
+                          ? "max-h-full opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >
-                      <ul className="space-y-1.5">
-                        {section.items.map((item) => {
-                          const active = isActive(item.path);
-                          return (
-                            <li key={item.id}>
-                              <Link
-                                to={item.path}
-                                onClick={onClose}
-                                className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                                  active
-                                    ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                                }`}
-                              >
-                                <span>{item.icon}</span>
-                                <span>{item.name}</span>
-                              </Link>
-                            </li>
-                          );
-                        })}
+                      <ul
+                        className={`${
+                          isCollapsed ? "space-y-2" : "space-y-1.5"
+                        }`}
+                      >
+                        {section.items.map((item) => (
+                          <li key={item.id}>
+                            <MenuItem
+                              item={item}
+                              isActive={isActive(item.path)}
+                              isCollapsed={isCollapsed}
+                              onClose={onClose}
+                            />
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
@@ -306,145 +527,97 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth, setSidebarWidth }) => {
               })}
             </div>
           </nav>
-          {/* End Body */}
 
           {/* Profile Section at bottom */}
           <div className="mt-auto border-t border-gray-200/60 dark:border-neutral-700/60 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-neutral-900/30">
-            {/* User Info with Arrow */}
             <div className="p-4">
-              <button
-                type="button"
-                onClick={() => toggleSection("general")}
-                className="w-full flex items-center justify-between gap-3 mb-4 hover:bg-gray-50 dark:hover:bg-neutral-800/50 rounded-lg p-2 -m-2 transition-colors duration-150"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative flex-shrink-0">
-                    <UserAvatar
-                      username={user?.username}
-                      headshot={user?.headshot}
-                      has_headshot={user?.has_headshot}
-                      size={44}
-                    />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate text-left">
-                      {user?.first_name && user?.last_name
-                        ? `${user.first_name} ${user.last_name}`
-                        : user?.username || "User"}
-                    </p>
-                    {user?.email && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-0.5 text-left">
-                        {user.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              {isCollapsed ? (
+                <CollapsedProfile
+                  user={user}
+                  generalMenuItems={generalMenuItems}
+                  isActive={isActive}
+                  onClose={onClose}
+                  handleLogoutClick={handleLogoutClick}
+                />
+              ) : (
+                <ExpandedProfile
+                  user={user}
+                  generalMenuItems={generalMenuItems}
+                  expandedSections={expandedSections}
+                  toggleSection={toggleSection}
+                  isActive={isActive}
+                  onClose={onClose}
+                  handleLogoutClick={handleLogoutClick}
+                />
+              )}
+            </div>
+          </div>
+        </div>
 
-                {/* Arrow */}
-                <svg
-                  className={`size-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${
-                    expandedSections.has("general") ? "rotate-180" : ""
-                  }`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {/* General Menu Section - Collapsible */}
+        {/* Resize Handle - Minimalist design, transforms to expand arrow when collapsed */}
+        {isCollapsed ? (
+          /* Expand Arrow Button when collapsed */
+          <button
+            onClick={handleExpandClick}
+            className="hidden lg:flex absolute top-1/2 -right-2 transform -translate-y-1/2 w-5 h-5 items-center justify-center bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-full shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-neutral-700 transition-all duration-200 cursor-pointer z-[60] group"
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+          >
+            <svg
+              className="w-2 h-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        ) : (
+          /* 3-Dot Resize Handle when expanded */
+          <div
+            ref={resizeHandleRef}
+            onMouseDown={handleMouseDown}
+            className={`hidden lg:flex absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 cursor-col-resize transition-all duration-200 group ${
+              isResizing ? "scale-110" : "hover:scale-125"
+            }`}
+            style={{
+              zIndex: 60,
+              touchAction: "none",
+            }}
+            aria-label="Resize sidebar"
+          >
+            <div className="flex flex-col gap-1 p-1">
               <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  expandedSections.has("general")
-                    ? "max-h-96 opacity-100"
-                    : "max-h-0 opacity-0"
+                className={`w-1 h-1 rounded-full border transition-all duration-200 ${
+                  isResizing
+                    ? "bg-indigo-400 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-300"
+                    : "bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-hover:border-gray-600 dark:group-hover:border-gray-300"
                 }`}
-              >
-                <ul className="space-y-1.5">
-                  {generalMenuItems.map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                      <li key={item.id}>
-                        <Link
-                          to={item.path}
-                          onClick={onClose}
-                          className={`flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium rounded-xl transition-colors duration-150 ${
-                            active
-                              ? "bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 text-indigo-700 dark:text-indigo-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                          }`}
-                        >
-                          <span>{item.icon}</span>
-                          <span>{item.name}</span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                  <li>
-                    <button
-                      type="button"
-                      onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-x-2 py-2.5 px-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-700/50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                    >
-                      <svg
-                        className="size-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" x2="9" y1="12" y2="12" />
-                      </svg>
-                      Sign out
-                    </button>
-                  </li>
-                </ul>
-              </div>
+              />
+              <div
+                className={`w-1 h-1 rounded-full border transition-all duration-200 ${
+                  isResizing
+                    ? "bg-indigo-400 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-300"
+                    : "bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-hover:border-gray-600 dark:group-hover:border-gray-300"
+                }`}
+              />
+              <div
+                className={`w-1 h-1 rounded-full border transition-all duration-200 ${
+                  isResizing
+                    ? "bg-indigo-400 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-300"
+                    : "bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-hover:border-gray-600 dark:group-hover:border-gray-300"
+                }`}
+              />
             </div>
           </div>
-        </div>
-
-        {/* Resize Handle */}
-        <div
-          ref={resizeHandleRef}
-          onMouseDown={handleMouseDown}
-          className={`hidden lg:block absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 w-3 h-12 cursor-col-resize rounded-lg transition-all duration-200 group ${
-            isResizing
-              ? "bg-gradient-to-b from-indigo-500 to-indigo-600 scale-110 shadow-lg shadow-indigo-500/50"
-              : "bg-gradient-to-b from-indigo-200 to-indigo-300 dark:from-indigo-700 dark:to-indigo-800 hover:from-indigo-400 hover:to-indigo-500 dark:hover:from-indigo-600 dark:hover:to-indigo-700 hover:scale-105 hover:shadow-md"
-          }`}
-          style={{
-            zIndex: 60,
-            touchAction: "none",
-          }}
-          aria-label="Resize sidebar"
-        >
-          {/* Visual indicator dots */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-70 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="flex flex-col gap-1.5">
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
-              <div className="w-1 h-1 rounded-full bg-white dark:bg-gray-200 shadow-sm"></div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
-      {/* End Sidebar */}
     </>
   );
 };
