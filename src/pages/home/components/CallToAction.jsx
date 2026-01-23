@@ -54,7 +54,7 @@ const CallToAction = () => {
             id="cta-heading"
             className="mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white"
           >
-            Join as a Mental Health Professional
+            Join as a Professional
           </h2>
 
           <p className="mb-10 md:mb-12 text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
