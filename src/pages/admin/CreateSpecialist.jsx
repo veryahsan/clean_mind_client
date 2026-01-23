@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "../../hooks/useForm";
 import AdminNavbar from "../../components/layout/AdminNavbar";
 import api from "../../services/api";
 import Loader from "../../components/common/Loader";
@@ -19,44 +20,58 @@ const SPECIALIST_TYPES = [
 
 const CreateSpecialist = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [apiError, setApiError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const initialValues = {
     username: "",
     email: "",
     password: "",
     specialist_type: "",
     custom_specialist_type: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-    setError("");
-    setSuccess("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const validationRules = {
+    username: {
+      required: "Username is required",
+      minLength: {
+        value: 3,
+        message: "Username must be at least 3 characters",
+      },
+    },
+    email: {
+      required: "Email is required",
+      pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Please enter a valid email address",
+      },
+    },
+    password: {
+      required: "Password is required",
+      minLength: {
+        value: 6,
+        message: "Password must be at least 6 characters",
+      },
+    },
+    specialist_type: {
+      required: "Specialist type is required",
+    },
+    custom_specialist_type: {
+      custom: (value, formValues) => {
+        if (formValues.specialist_type === "custom" && !value.trim()) {
+          return "Please enter a custom specialist type";
+        }
+        return "";
+      },
+    },
+  };
+
+  const onSubmit = async (formData) => {
+    setApiError("");
     setSuccess("");
 
-    // Validate custom type if selected
-    if (
-      formData.specialist_type === "custom" &&
-      !formData.custom_specialist_type.trim()
-    ) {
-      setError("Please enter a custom specialist type");
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Prepare payload - use custom_specialist_type if "custom" is selected, otherwise use specialist_type
+      // Prepare payload - use custom_specialist_type if "custom" is selected
       const payload = {
         username: formData.username,
         email: formData.email,
@@ -72,33 +87,50 @@ const CreateSpecialist = () => {
 
       if (data?.success) {
         setSuccess("Specialist created successfully!");
-        setFormData({
-          username: "",
-          email: "",
-          password: "",
-          specialist_type: "",
-          custom_specialist_type: "",
-        });
+        reset();
         setTimeout(() => {
           navigate("/admin/specialists");
         }, 2000);
       } else {
-        setError(data?.message || "Failed to create specialist");
+        setApiError(data?.message || "Failed to create specialist");
       }
     } catch (err) {
       console.error("Failed to create specialist:", err);
       const errorData = err.response?.data;
+
       if (errorData?.errors) {
+        // Set server-side validation errors
+        setServerErrors(errorData.errors);
+
+        // Also set a general error message
         const errorMessages = Object.values(errorData.errors).flat();
-        setError(errorMessages.join(", ") || "Failed to create specialist");
+        setApiError(errorMessages.join(", "));
       } else {
-        setError(
+        setApiError(
           errorData?.message || "Failed to create specialist. Please try again."
         );
       }
-    } finally {
-      setLoading(false);
+
+      throw err; // Re-throw to let useForm handle it
     }
+  };
+
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setServerErrors,
+    reset,
+  } = useForm(initialValues, validationRules, onSubmit);
+
+  const handleInputChange = (e) => {
+    handleChange(e);
+    setApiError("");
+    setSuccess("");
   };
 
   return (
@@ -116,7 +148,7 @@ const CreateSpecialist = () => {
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <ErrorMessage message={error} />
+            <ErrorMessage message={apiError} />
             <SuccessMessage message={success} />
 
             <div>
@@ -130,11 +162,16 @@ const CreateSpecialist = () => {
                 type="text"
                 id="username"
                 name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
+                value={values.username}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
               />
+              {touched.username && errors.username && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.username}
+                </p>
+              )}
             </div>
 
             <div>
@@ -148,11 +185,16 @@ const CreateSpecialist = () => {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                value={values.email}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
               />
+              {touched.email && errors.email && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             <div>
@@ -166,11 +208,16 @@ const CreateSpecialist = () => {
                 type="password"
                 id="password"
                 name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+                value={values.password}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
               />
+              {touched.password && errors.password && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             <div>
@@ -183,9 +230,9 @@ const CreateSpecialist = () => {
               <select
                 id="specialist_type"
                 name="specialist_type"
-                value={formData.specialist_type}
-                onChange={handleChange}
-                required
+                value={values.specialist_type}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Select a type</option>
@@ -195,9 +242,14 @@ const CreateSpecialist = () => {
                   </option>
                 ))}
               </select>
+              {touched.specialist_type && errors.specialist_type && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.specialist_type}
+                </p>
+              )}
             </div>
 
-            {formData.specialist_type === "custom" && (
+            {values.specialist_type === "custom" && (
               <div>
                 <label
                   htmlFor="custom_specialist_type"
@@ -209,22 +261,28 @@ const CreateSpecialist = () => {
                   type="text"
                   id="custom_specialist_type"
                   name="custom_specialist_type"
-                  value={formData.custom_specialist_type}
-                  onChange={handleChange}
-                  required
+                  value={values.custom_specialist_type}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
                   placeholder="e.g., Occupational Therapist, Speech Therapist"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                 />
+                {touched.custom_specialist_type &&
+                  errors.custom_specialist_type && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {errors.custom_specialist_type}
+                    </p>
+                  )}
               </div>
             )}
 
             <div className="flex gap-4">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
+                {isSubmitting ? (
                   <Loader fullScreen={false} size={20} />
                 ) : (
                   "Create Specialist"
