@@ -26,6 +26,7 @@ const Profile = () => {
     email: '',
     first_name: '',
     last_name: '',
+    availability_status: '',
   });
   const [successMessage, setSuccessMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,6 +38,7 @@ const Profile = () => {
         email: profileData.email || '',
         first_name: profileData.first_name || '',
         last_name: profileData.last_name || '',
+        availability_status: profileData.availability_status || 'offline',
       });
     }
   }, [profileData]);
@@ -71,6 +73,11 @@ const Profile = () => {
       }
       if (formData.last_name !== undefined) {
         submitFormData.append('last_name', formData.last_name || '');
+      }
+      
+      // Add availability_status for specialists
+      if (profileData?.role === 'specialist' && formData.availability_status) {
+        submitFormData.append('availability_status', formData.availability_status);
       }
       
       if (selectedFile) {
@@ -194,6 +201,22 @@ const Profile = () => {
               <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
                 {profileData?.role === "specialist" ? "Medical Specialist" : "Member"}
               </span>
+              {profileData?.role === "specialist" && profileData?.availability_status && (
+                <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ml-2 ${
+                  profileData.availability_status === 'available' 
+                    ? 'bg-green-100 text-green-800'
+                    : profileData.availability_status === 'on-leave'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : profileData.availability_status === 'in-emergency'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {profileData.availability_status === 'available' ? 'Available' :
+                   profileData.availability_status === 'on-leave' ? 'On Leave' :
+                   profileData.availability_status === 'in-emergency' ? 'In Emergency' :
+                   'Offline'}
+                </span>
+              )}
             </div>
           </div>
 
@@ -283,6 +306,28 @@ const Profile = () => {
                   Role cannot be changed
                 </p>
               </div>
+
+              {/* Availability Status - Only for Specialists */}
+              {profileData?.role === "specialist" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Availability Status
+                  </label>
+                  <select
+                    value={formData.availability_status}
+                    onChange={(e) => setFormData({ ...formData, availability_status: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                  >
+                    <option value="offline">Offline</option>
+                    <option value="available">Available</option>
+                    <option value="on-leave">On Leave</option>
+                    <option value="in-emergency">In Emergency</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Update your current availability status
+                  </p>
+                </div>
+              )}
             </div>
 
 

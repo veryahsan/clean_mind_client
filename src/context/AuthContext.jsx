@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }) => {
         last_name: profileData.last_name,
         headshot: profileData.headshot,
         has_headshot: profileData.has_headshot,
+        availability_status: profileData.availability_status,
       };
     } catch (err) {
       console.error("Failed to fetch user profile:", err);

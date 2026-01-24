@@ -50,15 +50,13 @@ const CollapsedProfile = ({
   handleLogoutClick,
 }) => (
   <div className="flex flex-col items-center gap-4">
-    <div className="relative">
-      <UserAvatar
-        username={user?.username}
-        headshot={user?.headshot}
-        has_headshot={user?.has_headshot}
-        size={44}
-      />
-      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
-    </div>
+    <UserAvatar
+      username={user?.username}
+      headshot={user?.headshot}
+      has_headshot={user?.has_headshot}
+      size={44}
+      availability_status={user?.role === 'specialist' ? user?.availability_status : undefined}
+    />
 
     <ul className="space-y-2 w-full">
       {generalMenuItems.map((item) => (
@@ -122,8 +120,8 @@ const ExpandedProfile = ({
             headshot={user?.headshot}
             has_headshot={user?.has_headshot}
             size={44}
+            availability_status={user?.role === 'specialist' ? user?.availability_status : undefined}
           />
-          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-neutral-800 rounded-full shadow-sm"></div>
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-900 dark:text-white truncate text-left">
