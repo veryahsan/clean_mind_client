@@ -15,7 +15,7 @@ import VerifyCode from "../pages/accounts/VerifyCode";
 import CreateSpecialist from "../pages/accounts/CreateSpecialist";
 
 // User Pages
-import MemberDashboard from "../pages/dashboard/MemberDashboard";
+import Dashboard from "../pages/dashboard/Dashboard";
 import Calendar from "../pages/calendar/Calendar";
 import Messages from "../pages/messages/Messages";
 import Assistant from "../pages/assistant/Assistant";
@@ -157,7 +157,7 @@ const AppRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <MemberDashboard />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
