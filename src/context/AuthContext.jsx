@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
       const userData = {
         id: decoded.user_id,
         username: decoded.username,
+        email: decoded.email,
         role: decoded.role,
         is_staff: decoded.is_staff || false,
         is_superuser: decoded.is_superuser || false,
@@ -87,6 +88,7 @@ export const AuthProvider = ({ children }) => {
         const userData = {
           id: decoded.user_id,
           username: decoded.username,
+          email: decoded.email,
           role: decoded.role,
           is_staff: decoded.is_staff || false,
           is_superuser: decoded.is_superuser || false,
