@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Mood API instance for mood-related endpoints
 const moodApi = axios.create({
-  baseURL: "/api/mood/", // Uses Vite proxy to avoid CORS issues
+  baseURL: "/api/members/mood/", // Uses Vite proxy to avoid CORS issues
   headers: {
     "Content-Type": "application/json",
   },
