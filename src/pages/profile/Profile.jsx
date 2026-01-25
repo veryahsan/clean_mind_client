@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useProfile } from "../../hooks/useProfile";
 import { useFileUpload } from "../../hooks/useFileUpload";
+import { useForm } from "../../hooks/useForm";
 import { getMediaUrl } from "../../utils/imageUtils";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
@@ -21,47 +22,38 @@ const Profile = () => {
     clearFile,
     setError: setFileError,
   } = useFileUpload({ maxSize: 5 * 1024 * 1024 });
-  
-  const [formData, setFormData] = useState({
+
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // Validation rules
+  const validationRules = {
+    email: {
+      pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: "Enter a valid email address",
+      },
+    },
+    first_name: {},
+    last_name: {},
+    availability_status: {},
+  };
+
+  // Initialize form with empty values (will be populated when profileData loads)
+  const initialValues = {
     email: '',
     first_name: '',
     last_name: '',
-    availability_status: '',
-  });
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Update form data when profile data loads
-  useEffect(() => {
-    if (profileData) {
-      setFormData({
-        email: profileData.email || '',
-        first_name: profileData.first_name || '',
-        last_name: profileData.last_name || '',
-        availability_status: profileData.availability_status || 'offline',
-      });
-    }
-  }, [profileData]);
-
-  const handleImageClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    availability_status: 'offline',
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (isSubmitting) return;
-
+  // Form submission handler (defined before useForm to avoid circular dependency)
+  const handleFormSubmit = async (formData) => {
     // Clear any previous errors
     setError(null);
     setFileError(null);
     setSuccessMessage(null);
 
     try {
-      setIsSubmitting(true);
-
       // Create FormData for multipart/form-data
       const submitFormData = new FormData();
       
@@ -96,8 +88,47 @@ const Profile = () => {
       }
     } catch (err) {
       console.error("Failed to update profile:", err);
-    } finally {
-      setIsSubmitting(false);
+      throw err;
+    }
+  };
+
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFormValues,
+    clearErrors,
+  } = useForm(initialValues, validationRules, handleFormSubmit);
+
+  // Handle server errors from API responses
+  useEffect(() => {
+    if (error) {
+      // If error contains field-specific errors, set them in the form
+      // This would need to be handled based on your API error format
+      // For now, we'll just clear form errors when there's a general error
+      clearErrors();
+    }
+  }, [error, clearErrors]);
+
+  // Update form values when profile data loads
+  useEffect(() => {
+    if (profileData) {
+      setFormValues({
+        email: profileData.email || '',
+        first_name: profileData.first_name || '',
+        last_name: profileData.last_name || '',
+        availability_status: profileData.availability_status || 'offline',
+      });
+    }
+  }, [profileData, setFormValues]);
+
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -230,6 +261,7 @@ const Profile = () => {
               onChange={handleFileChange}
               disabled={isSubmitting}
               className="hidden"
+              name="headshot"
             />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -256,11 +288,20 @@ const Profile = () => {
                 </label>
                 <input
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900 ${
+                    touched.email && errors.email
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Enter your email"
                 />
+                {touched.email && errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
               </div>
 
               {/* First Name */}
@@ -270,11 +311,20 @@ const Profile = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                  name="first_name"
+                  value={values.first_name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900 ${
+                    touched.first_name && errors.first_name
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Enter your first name"
                 />
+                {touched.first_name && errors.first_name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.first_name}</p>
+                )}
               </div>
 
               {/* Last Name */}
@@ -284,11 +334,20 @@ const Profile = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                  name="last_name"
+                  value={values.last_name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900 ${
+                    touched.last_name && errors.last_name
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Enter your last name"
                 />
+                {touched.last_name && errors.last_name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.last_name}</p>
+                )}
               </div>
 
               {/* Role */}
@@ -314,15 +373,24 @@ const Profile = () => {
                     Availability Status
                   </label>
                   <select
-                    value={formData.availability_status}
-                    onChange={(e) => setFormData({ ...formData, availability_status: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900"
+                    name="availability_status"
+                    value={values.availability_status}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-900 ${
+                      touched.availability_status && errors.availability_status
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
                   >
                     <option value="offline">Offline</option>
                     <option value="available">Available</option>
                     <option value="on-leave">On Leave</option>
                     <option value="in-emergency">In Emergency</option>
                   </select>
+                  {touched.availability_status && errors.availability_status && (
+                    <p className="text-xs text-red-500 mt-1">{errors.availability_status}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">
                     Update your current availability status
                   </p>

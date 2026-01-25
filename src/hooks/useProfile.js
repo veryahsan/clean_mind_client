@@ -79,6 +79,7 @@ export const useProfile = () => {
         last_name: updatedData.last_name,
         headshot: updatedData.headshot,
         has_headshot: updatedData.has_headshot,
+        availability_status: updatedData.availability_status,
       };
       updateUser(updatedUserData);
       
