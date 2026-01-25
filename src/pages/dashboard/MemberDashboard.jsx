@@ -6,7 +6,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import MoodTracker from "../../components/mood/MoodTracker";
 import SectionButton from "../../components/common/SectionButton";
 
-const MemberDashboard = () => {
+const MemberDashboard = ({ dashboardData }) => {
   const navigate = useNavigate();
 
   const sections = [

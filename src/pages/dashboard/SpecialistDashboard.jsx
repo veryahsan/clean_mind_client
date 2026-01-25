@@ -12,7 +12,7 @@ import profileApi from "../../services/profileApi";
 import Loader from "../../components/common/Loader";
 import AvailabilityStatusDropdown from "../../components/common/AvailabilityStatusDropdown";
 
-const SpecialistDashboard = () => {
+const SpecialistDashboard = ({ dashboardData }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [availabilityStatus, setAvailabilityStatus] = useState(user?.availability_status || 'offline');

@@ -2,7 +2,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
-import profileApi from "../services/profileApi";
 
 export const AuthContext = createContext(null);
 
@@ -14,39 +13,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!storedToken);
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchUserProfile = async () => {
-    try {
-      const response = await profileApi.get("");
-      const responseData = response.data;
-      
-      // Handle standardized response format
-      let profileData;
-      if (responseData.success && responseData.data) {
-        profileData = responseData.data;
-      } else {
-        // Fallback for old format (backward compatibility)
-        profileData = responseData;
-      }
-      
-      // Merge profile data with existing user data
-      return {
-        id: profileData.id,
-        username: profileData.username,
-        role: profileData.role,
-        email: profileData.email,
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-        headshot: profileData.headshot,
-        has_headshot: profileData.has_headshot,
-        availability_status: profileData.availability_status,
-      };
-    } catch (err) {
-      console.error("Failed to fetch user profile:", err);
-      // Return null if profile fetch fails - we'll use basic JWT data
-      return null;
-    }
-  };
 
   const checkAuth = async () => {
     const storedToken = localStorage.getItem("access_token");
@@ -61,24 +27,13 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const decoded = jwtDecode(storedToken);
-      let userData = {
+      const userData = {
         id: decoded.user_id,
         username: decoded.username,
         role: decoded.role,
         is_staff: decoded.is_staff || false,
         is_superuser: decoded.is_superuser || false,
       };
-
-      // Try to fetch full profile data including headshot
-      const profileData = await fetchUserProfile();
-      if (profileData) {
-        // Merge profile data but preserve is_staff and is_superuser from JWT (they're more reliable)
-        userData = {
-          ...profileData,
-          is_staff: profileData.is_staff !== undefined ? profileData.is_staff : userData.is_staff,
-          is_superuser: profileData.is_superuser !== undefined ? profileData.is_superuser : userData.is_superuser,
-        };
-      }
 
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -129,24 +84,13 @@ export const AuthProvider = ({ children }) => {
         setToken(access);
 
         const decoded = jwtDecode(access);
-        let userData = {
+        const userData = {
           id: decoded.user_id,
           username: decoded.username,
           role: decoded.role,
           is_staff: decoded.is_staff || false,
           is_superuser: decoded.is_superuser || false,
         };
-
-        // Try to fetch full profile data including headshot
-        const profileData = await fetchUserProfile();
-        if (profileData) {
-          // Merge profile data but preserve is_staff and is_superuser from JWT
-          userData = {
-            ...profileData,
-            is_staff: profileData.is_staff !== undefined ? profileData.is_staff : userData.is_staff,
-            is_superuser: profileData.is_superuser !== undefined ? profileData.is_superuser : userData.is_superuser,
-          };
-        }
 
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
