@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Profile API instance for profile-related endpoints
 const profileApi = axios.create({
-  baseURL: "/api/profile/", // Uses Vite proxy to avoid CORS issues
+  baseURL: "/api/auth/profile/", // Uses Vite proxy to avoid CORS issues
   // Don't set Content-Type here - let axios set it automatically
   // It will be 'application/json' for regular requests and 'multipart/form-data' for file uploads
 });
