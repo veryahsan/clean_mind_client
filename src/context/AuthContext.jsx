@@ -14,6 +14,22 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!storedToken);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchUserDisplay = async () => {
+    try {
+      const response = await api.get("me/");
+      const responseData = response.data;
+      
+      // Handle standardized response format
+      if (responseData.success && responseData.data) {
+        return responseData.data;
+      }
+      return null;
+    } catch (err) {
+      console.error("Failed to fetch user display info:", err);
+      return null;
+    }
+  };
+
   const checkAuth = async () => {
     const storedToken = localStorage.getItem("access_token");
     if (!storedToken) {
@@ -27,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const decoded = jwtDecode(storedToken);
-      const userData = {
+      let userData = {
         id: decoded.user_id,
         username: decoded.username,
         email: decoded.email,
@@ -35,6 +51,15 @@ export const AuthProvider = ({ children }) => {
         is_staff: decoded.is_staff || false,
         is_superuser: decoded.is_superuser || false,
       };
+
+      // Fetch lightweight user display info (headshot, first_name, last_name, etc.)
+      const displayData = await fetchUserDisplay();
+      if (displayData) {
+        userData = {
+          ...userData,
+          ...displayData, // Merge display data (headshot, first_name, last_name, availability_status)
+        };
+      }
 
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -85,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         setToken(access);
 
         const decoded = jwtDecode(access);
-        const userData = {
+        let userData = {
           id: decoded.user_id,
           username: decoded.username,
           email: decoded.email,
@@ -93,6 +118,15 @@ export const AuthProvider = ({ children }) => {
           is_staff: decoded.is_staff || false,
           is_superuser: decoded.is_superuser || false,
         };
+
+        // Fetch lightweight user display info (headshot, first_name, last_name, etc.)
+        const displayData = await fetchUserDisplay();
+        if (displayData) {
+          userData = {
+            ...userData,
+            ...displayData, // Merge display data (headshot, first_name, last_name, availability_status)
+          };
+        }
 
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
