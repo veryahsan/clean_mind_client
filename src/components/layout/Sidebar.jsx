@@ -55,7 +55,7 @@ const CollapsedProfile = ({
       headshot={user?.headshot}
       has_headshot={user?.has_headshot}
       size={44}
-      availability_status={user?.role === 'specialist' ? user?.availability_status : undefined}
+      availability_status={user?.availability_status}
     />
 
     <ul className="space-y-2 w-full">
@@ -120,7 +120,7 @@ const ExpandedProfile = ({
             headshot={user?.headshot}
             has_headshot={user?.has_headshot}
             size={44}
-            availability_status={user?.role === 'specialist' ? user?.availability_status : undefined}
+            availability_status={user?.availability_status}
           />
         </div>
         <div className="flex-1 min-w-0">
