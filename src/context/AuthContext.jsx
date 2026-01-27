@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
+import profileApi from "../services/profileApi";
 
 export const AuthContext = createContext(null);
 
@@ -13,6 +14,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!storedToken);
   const [isLoading, setIsLoading] = useState(true);
+
+  const updateAvailabilityStatus = async (status) => {
+    try {
+      const formData = new FormData();
+      formData.append("availability_status", status);
+      await profileApi.patch("", formData);
+    } catch (err) {
+      console.error("Failed to update availability status:", err);
+    }
+  };
 
   const fetchUserDisplay = async () => {
     try {
@@ -128,6 +139,18 @@ export const AuthProvider = ({ children }) => {
           };
         }
 
+        // Mark user as available on successful login
+        try {
+          await updateAvailabilityStatus("available");
+          userData = {
+            ...userData,
+            availability_status: "available",
+          };
+        } catch (e) {
+          // Availability update failure shouldn't block login
+          console.error("Failed to mark user as available on login:", e);
+        }
+
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
         setIsAuthenticated(true);
@@ -165,6 +188,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Fire-and-forget: mark user as offline, but don't block logout if it fails
+    updateAvailabilityStatus("offline");
+
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
