@@ -10,6 +10,7 @@ import Avatar from "@mui/material/Avatar";
 import UserAvatar from "../../components/layout/UserAvatar";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import EditPublicProfile from "./components/EditPublicProfile";
 
 const Profile = () => {
   const { profileData, loading, error, updateProfile, setError } = useProfile();
@@ -80,11 +81,8 @@ const Profile = () => {
 
       if (result.success) {
         clearFile();
-        setSuccessMessage("Profile updated successfully!");
-        
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 5000);
+        setSuccessMessage("Profile updated successfully.");
+        setTimeout(() => setSuccessMessage(null), 5000);
       }
     } catch (err) {
       console.error("Failed to update profile:", err);
@@ -114,7 +112,7 @@ const Profile = () => {
     }
   }, [error, clearErrors]);
 
-  // Update form values when profile data loads
+  // Update main form values when profile data loads
   useEffect(() => {
     if (profileData) {
       setFormValues({
@@ -398,7 +396,6 @@ const Profile = () => {
               )}
             </div>
 
-
             {/* Update Button */}
             <div className=" flex items-center justify-between">
               <button
@@ -424,6 +421,12 @@ const Profile = () => {
               )}
             </div>
           </form>
+
+          <EditPublicProfile
+            profileData={profileData}
+            updateProfile={updateProfile}
+            setError={setError}
+          />
       </div>
     </div>
   );

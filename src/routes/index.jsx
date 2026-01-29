@@ -21,6 +21,7 @@ import Messages from "../pages/messages/Messages";
 import Assistant from "../pages/assistant/Assistant";
 import Notifications from "../pages/notifications/Notifications";
 import Profile from "../pages/profile/Profile";
+import PublicDoctorProfile from "../pages/profile/PublicDoctorProfile";
 import Appointments from "../pages/appointments/Appointments";
 import ExploreDoctors from "../pages/explore-doctors/ExploreDoctors";
 
@@ -201,6 +202,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      {/* Public doctor profile: no login required */}
+      <Route path="/profile/doctor/:id" element={<PublicDoctorProfile />} />
       <Route
         path="/appointments"
         element={
