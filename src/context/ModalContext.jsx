@@ -10,16 +10,24 @@ export const useModal = () => {
   return context;
 };
 
+const DEFAULT_OPTIONS = {
+  minWidth: 'min(320px, 90vw)',
+  maxWidth: '90vw',
+  maxHeight: '90vh',
+};
+
 export const ModalProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
+  const [modalOptions, setModalOptions] = useState(DEFAULT_OPTIONS);
   const [isClosing, setIsClosing] = useState(false);
 
-  const openModal = useCallback((content) => {
+  const openModal = useCallback((content, options = {}) => {
     if (!content) {
       console.error("ModalContext: openModal called with no content");
       return;
     }
     setModalContent(content);
+    setModalOptions({ ...DEFAULT_OPTIONS, ...options });
     setIsClosing(false);
   }, []);
 
@@ -27,6 +35,7 @@ export const ModalProvider = ({ children }) => {
     setIsClosing(true);
     setTimeout(() => {
       setModalContent(null);
+      setModalOptions(DEFAULT_OPTIONS);
       setIsClosing(false);
     }, 300);
   }, []);
@@ -54,14 +63,17 @@ export const ModalProvider = ({ children }) => {
           onClick={closeModal}
         >
           <div
-            className={`bg-white dark:bg-gray-900 rounded-2xl relative transform transition-all duration-300 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col ${
+            className={`bg-white dark:bg-gray-900 rounded-2xl relative transform transition-all duration-300 shadow-2xl overflow-hidden flex flex-col ${
               isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
             }`}
             onClick={(e) => e.stopPropagation()}
-            style={{ 
-              width: 'fit-content',
-              minWidth: 'min(320px, 90vw)',
-              maxWidth: '90vw'
+            style={{
+              width: modalOptions.width ?? 'fit-content',
+              minWidth: modalOptions.minWidth ?? DEFAULT_OPTIONS.minWidth,
+              maxWidth: modalOptions.maxWidth ?? DEFAULT_OPTIONS.maxWidth,
+              minHeight: modalOptions.minHeight,
+              height: modalOptions.height,
+              maxHeight: modalOptions.maxHeight ?? DEFAULT_OPTIONS.maxHeight,
             }}
           >
             <div className="overflow-y-auto flex-1 p-4 sm:p-6">
