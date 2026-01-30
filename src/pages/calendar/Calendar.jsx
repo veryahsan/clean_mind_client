@@ -2,14 +2,29 @@ import React from "react";
 
 const Calendar = () => {
   return (
-    <div className="bg-white p-6">
-      <div className="max-w-[1440px] mx-auto w-full">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Calendar
-        </h1>
-        <p className="text-gray-700">
-          Calendar view coming soon...
-        </p>
+    <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-950">
+      <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-5 py-5 space-y-4">
+        <header className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-4 sm:px-5 sm:py-4 shadow-sm">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">
+                Smart Calendar
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                View and manage your schedule and appointments.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section
+          className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 py-12 px-4 text-center shadow-sm"
+          aria-label="Calendar content"
+        >
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            Calendar view coming soon...
+          </p>
+        </section>
       </div>
     </div>
   );
