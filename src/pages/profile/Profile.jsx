@@ -39,12 +39,12 @@ const Profile = () => {
     availability_status: {},
   };
 
-  // Initialize form with empty values (will be populated when profileData loads)
+  // Initial form values: use loaded profile when available so dirty-check compares against it
   const initialValues = {
-    email: '',
-    first_name: '',
-    last_name: '',
-    availability_status: 'offline',
+    email: profileData?.email ?? '',
+    first_name: profileData?.first_name ?? '',
+    last_name: profileData?.last_name ?? '',
+    availability_status: profileData?.availability_status ?? 'offline',
   };
 
   // Form submission handler (defined before useForm to avoid circular dependency)
@@ -95,6 +95,7 @@ const Profile = () => {
     errors,
     touched,
     isSubmitting,
+    canSubmit,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -400,7 +401,7 @@ const Profile = () => {
             <div className=" flex items-center justify-between">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={!canSubmit && !selectedFile}
                 className="px-6 py-2 bg-primary hover:bg-primaryHover text-white rounded-md font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSubmitting && (
