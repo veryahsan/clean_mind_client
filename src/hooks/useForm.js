@@ -1,4 +1,31 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+
+// Compare current form state to initial; true if something changed
+function getIsDirty(values, initialValues, files) {
+  const allKeys = new Set([
+    ...Object.keys(initialValues || {}),
+    ...Object.keys(values || {}),
+  ]);
+  for (const key of allKeys) {
+    const current = values?.[key];
+    const initial = initialValues?.[key];
+    if (current === initial) continue;
+    if (
+      Array.isArray(current) &&
+      Array.isArray(initial) &&
+      current.length === initial.length &&
+      current.every(
+        (item, i) =>
+          item === initial[i] ||
+          (item?.id != null && initial[i]?.id === item.id)
+      )
+    ) {
+      continue;
+    }
+    return true;
+  }
+  return Object.keys(files || {}).length > 0;
+}
 
 export function useForm(initialValues, validationRules = {}, onSubmit) {
   const [values, setValues] = useState(initialValues);
@@ -229,11 +256,34 @@ export function useForm(initialValues, validationRules = {}, onSubmit) {
     setErrors({});
   }, []);
 
+  // Whether the form has changed from initial values (enables submit)
+  const isDirty = useMemo(
+    () => getIsDirty(values, initialValues, files),
+    [values, initialValues, files]
+  );
+
+  // Current validation result; used to gate submit and avoid backend hits
+  const formErrors = useMemo(
+    () => validateForm(),
+    [validateForm, values, files]
+  );
+
+  // Submit only when something changed and all validation rules pass
+  const canSubmit =
+    isDirty &&
+    Object.keys(formErrors).length === 0 &&
+    !isSubmitting;
+
   // Handle form submission
   const handleSubmit = useCallback(
     async (e) => {
       if (e && e.preventDefault) {
         e.preventDefault();
+      }
+
+      // Avoid backend hit when nothing changed
+      if (!getIsDirty(values, initialValues, files)) {
+        return { success: false, errors: {}, skipped: "no_changes" };
       }
 
       // Mark all fields as touched
@@ -244,25 +294,25 @@ export function useForm(initialValues, validationRules = {}, onSubmit) {
       setTouched(allTouched);
 
       // Validate form
-      const formErrors = validateForm();
-      setErrors(formErrors);
+      const errors = validateForm();
+      setErrors(errors);
 
-      if (Object.keys(formErrors).length === 0) {
-        setIsSubmitting(true);
-        try {
-          await onSubmit({ ...values, files });
-          return { success: true };
-        } catch (error) {
-          console.error("Submission error:", error);
-          return { success: false, error };
-        } finally {
-          setIsSubmitting(false);
-        }
+      if (Object.keys(errors).length > 0) {
+        return { success: false, errors };
       }
 
-      return { success: false, errors: formErrors };
+      setIsSubmitting(true);
+      try {
+        await onSubmit({ ...values, files });
+        return { success: true };
+      } catch (error) {
+        console.error("Submission error:", error);
+        return { success: false, error };
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [validationRules, validateForm, onSubmit, values, files]
+    [validationRules, validateForm, onSubmit, values, initialValues, files]
   );
 
   // Reset form
@@ -282,6 +332,8 @@ export function useForm(initialValues, validationRules = {}, onSubmit) {
     isSubmitting,
     files,
     selectedItems,
+    isDirty,
+    canSubmit,
     handleChange,
     handleFileChange,
     handleSelectItem,
