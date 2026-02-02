@@ -155,6 +155,7 @@ const Register = () => {
     errors,
     touched,
     isSubmitting,
+    canSubmit,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -307,9 +308,9 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={!canSubmit}
             className={`w-full bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg flex justify-center items-center ${
-              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              !canSubmit ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {isSubmitting ? (

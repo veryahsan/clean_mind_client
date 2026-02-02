@@ -120,6 +120,7 @@ const CreateSpecialist = () => {
     errors,
     touched,
     isSubmitting,
+    canSubmit,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -279,7 +280,7 @@ const CreateSpecialist = () => {
             <div className="flex gap-4">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={!canSubmit}
                 className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (

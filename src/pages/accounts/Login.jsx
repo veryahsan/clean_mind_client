@@ -192,6 +192,7 @@ const Login = () => {
     errors,
     touched,
     isSubmitting,
+    canSubmit,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -273,9 +274,9 @@ const Login = () => {
           <button
             type="submit"
             className={`w-full flex justify-center items-center gap-2 bg-primary hover:bg-primaryHover text-white py-3 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              !canSubmit ? "opacity-70 cursor-not-allowed" : ""
             }`}
-            disabled={isSubmitting}
+            disabled={!canSubmit}
           >
             {isSubmitting && (
               <Box sx={{ display: "flex" }}>
