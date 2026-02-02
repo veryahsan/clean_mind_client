@@ -19,7 +19,7 @@ module.exports = {
         body: "#6B7280",
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui"], // example
+        sans: ["Lato", "ui-sans-serif", "system-ui"],
       },
       animation: {
         blob: "blob 7s infinite",
