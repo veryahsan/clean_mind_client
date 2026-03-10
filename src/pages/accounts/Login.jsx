@@ -17,7 +17,7 @@ const Login = () => {
   // Validation rules
   const validationRules = {
     username: {
-      required: "Username is required",
+      required: "Email or username is required",
     },
     password: {
       required: "Password is required",
@@ -224,7 +224,7 @@ const Login = () => {
               htmlFor="username"
               className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
             >
-              Username
+              Email or username
             </label>
             <input
               id="username"
@@ -235,7 +235,7 @@ const Login = () => {
               onBlur={handleBlur}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white transition"
               disabled={isSubmitting}
-              placeholder="Enter your username"
+              placeholder="Enter your email or username"
               autoComplete="username"
             />
             {touched.username && errors.username && (
