@@ -67,10 +67,12 @@ export const menuSections = [
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-            <line x1="16" x2="16" y1="2" y2="6" />
-            <line x1="8" x2="8" y1="2" y2="6" />
-            <line x1="3" x2="21" y1="10" y2="10" />
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <circle cx="16" cy="16" r="3" />
+            <path d="M16 14v2l1 1" />
           </svg>
         ),
       },
@@ -82,7 +84,7 @@ export const menuSections = [
     items: [
       {
         id: "appointments",
-        name: "Appointments",
+        name: "My Appointments",
         path: "/appointments",
         icon: (
           <svg
