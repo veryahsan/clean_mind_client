@@ -135,11 +135,11 @@ const AppointmentRequestModal = ({ doctor, onSuccess, onClose }) => {
   })();
 
   return (
-    <RequestCard>
-      <div className="px-5 pt-5 pb-1 border-b border-neutral-200/80 dark:border-neutral-800/80 flex items-start gap-4">
+    <>
+      <div className="px-5 pt-5 pb-1 flex items-start gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">
-            Appointment request
+            Appointment Request
           </h3>
           <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-300">
             with {displayName}
@@ -293,7 +293,7 @@ const AppointmentRequestModal = ({ doctor, onSuccess, onClose }) => {
           </button>
         </div>
       </form>
-    </RequestCard>
+    </>
   );
 };
 

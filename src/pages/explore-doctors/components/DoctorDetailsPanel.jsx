@@ -161,8 +161,8 @@ const DoctorDetailsPanel = ({ doctorId }) => {
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4">
       {/* Header / hero */}
-      <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm overflow-hidden">
-        <div className="p-5 sm:p-6">
+      <section className="overflow-hidden">
+        <div>
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
             <div className="shrink-0">
               {headshotUrl ? (
