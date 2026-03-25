@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminNavbar from "../../components/layout/AdminNavbar";
 import adminApi from "../../services/adminApi";
+import usePaginatedQuery from "../../hooks/usePaginatedQuery";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import SuccessMessage from "../../components/common/SuccessMessage";
 import StatusCapsule from "../../components/common/StatusCapsule";
+import Paginator from "../../components/common/Paginator";
 import {
   PersonAdd,
   MoreVert,
@@ -15,23 +17,31 @@ import {
 
 const MembersList = () => {
   const navigate = useNavigate();
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: members,
+    pagination,
+    loading,
+    error: fetchError,
+    setPage,
+    setPageSize,
+    refetch,
+  } = usePaginatedQuery(adminApi, "members/");
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRefs = useRef({});
 
+  // Sync fetch errors into local error state
   useEffect(() => {
-    fetchMembers();
-  }, []);
+    if (fetchError) setError(fetchError);
+  }, [fetchError]);
 
   // Close menu when clicking outside
   useEffect(() => {
     if (openMenuId === null) return;
 
     const handleClickOutside = (event) => {
-      // Check if click is outside all menu refs
       const clickedInside = Object.values(menuRefs.current).some((ref) => {
         return ref && ref.contains(event.target);
       });
@@ -41,7 +51,6 @@ const MembersList = () => {
       }
     };
 
-    // Add listener after a short delay to avoid immediate closure
     const timeoutId = setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside);
     }, 10);
@@ -51,29 +60,6 @@ const MembersList = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openMenuId]);
-
-  const fetchMembers = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await adminApi.get("members/");
-      const data = response.data;
-
-      if (data?.success) {
-        setMembers(data.data || []);
-      } else {
-        setError(data?.message || "Failed to load members");
-      }
-    } catch (err) {
-      console.error("Failed to fetch members:", err);
-      const errorData = err.response?.data;
-      setError(
-        errorData?.message || "Failed to load members. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleEdit = (memberId) => {
     console.log("Edit clicked for member:", memberId);
@@ -96,9 +82,8 @@ const MembersList = () => {
 
       if (data?.success) {
         setSuccess("Member deleted successfully");
-        // Refresh the list after deletion
         setTimeout(() => {
-          fetchMembers();
+          refetch();
         }, 1000);
       } else {
         setError(data?.message || "Failed to delete member");
@@ -150,7 +135,7 @@ const MembersList = () => {
               Members
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage all member accounts ({members.length} total)
+              Manage all member accounts ({pagination.total} total)
             </p>
           </div>
           <Link
@@ -275,6 +260,11 @@ const MembersList = () => {
                 ))}
               </tbody>
             </table>
+            <Paginator
+              pagination={pagination}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
           </div>
         )}
       </div>

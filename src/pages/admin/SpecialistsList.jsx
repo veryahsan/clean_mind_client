@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminNavbar from "../../components/layout/AdminNavbar";
 import adminApi from "../../services/adminApi";
+import usePaginatedQuery from "../../hooks/usePaginatedQuery";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import SuccessMessage from "../../components/common/SuccessMessage";
 import StatusCapsule from "../../components/common/StatusCapsule";
+import Paginator from "../../components/common/Paginator";
 import {
   PersonAdd,
   MoreVert,
@@ -17,19 +19,28 @@ import {
 
 const SpecialistsList = () => {
   const navigate = useNavigate();
-  const [specialists, setSpecialists] = useState([]);
-  const [documentCounts, setDocumentCounts] = useState({}); // Track document counts per specialist
-  const [loading, setLoading] = useState(true);
+  const {
+    data: specialists,
+    pagination,
+    loading,
+    error: fetchError,
+    setPage,
+    setPageSize,
+    refetch,
+  } = usePaginatedQuery(adminApi, "specialists/");
+
+  const [documentCounts, setDocumentCounts] = useState({});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRefs = useRef({});
 
+  // Sync fetch errors into local error state
   useEffect(() => {
-    fetchSpecialists();
-  }, []);
+    if (fetchError) setError(fetchError);
+  }, [fetchError]);
 
-  // Fetch document counts for all specialists
+  // Fetch document counts for the current page of specialists
   useEffect(() => {
     if (specialists.length > 0) {
       fetchDocumentCounts();
@@ -41,7 +52,6 @@ const SpecialistsList = () => {
     if (openMenuId === null) return;
 
     const handleClickOutside = (event) => {
-      // Check if click is outside all menu refs
       const clickedInside = Object.values(menuRefs.current).some((ref) => {
         return ref && ref.contains(event.target);
       });
@@ -51,7 +61,6 @@ const SpecialistsList = () => {
       }
     };
 
-    // Add listener after a short delay to avoid immediate closure
     const timeoutId = setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside);
     }, 10);
@@ -61,29 +70,6 @@ const SpecialistsList = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openMenuId]);
-
-  const fetchSpecialists = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await adminApi.get("specialists/");
-      const data = response.data;
-
-      if (data?.success) {
-        setSpecialists(data.data || []);
-      } else {
-        setError(data?.message || "Failed to load specialists");
-      }
-    } catch (err) {
-      console.error("Failed to fetch specialists:", err);
-      const errorData = err.response?.data;
-      setError(
-        errorData?.message || "Failed to load specialists. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchDocumentCounts = async () => {
     // Fetch document counts for all specialists
@@ -152,9 +138,8 @@ const SpecialistsList = () => {
 
       if (data?.success) {
         setSuccess("Specialist deleted successfully");
-        // Refresh the list after deletion
         setTimeout(() => {
-          fetchSpecialists();
+          refetch();
         }, 1000);
       } else {
         setError(data?.message || "Failed to delete specialist");
@@ -228,7 +213,7 @@ const SpecialistsList = () => {
               Specialists
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage all specialist accounts ({specialists.length} total)
+              Manage all specialist accounts ({pagination.total} total)
             </p>
           </div>
           <Link
@@ -380,6 +365,11 @@ const SpecialistsList = () => {
                 ))}
               </tbody>
             </table>
+            <Paginator
+              pagination={pagination}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
           </div>
         )}
       </div>

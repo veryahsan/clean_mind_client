@@ -1,54 +1,36 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { getDoctors } from "../../services/exploreApi";
+import exploreApi from "../../services/exploreApi";
+import usePaginatedQuery from "../../hooks/usePaginatedQuery";
 import Loader from "../../components/common/Loader";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import Paginator from "../../components/common/Paginator";
 import DoctorList from "./components/DoctorList";
 import DoctorDetailsPanel from "./components/DoctorDetailsPanel";
 
 const ExploreDoctors = () => {
-  const [doctors, setDoctors] = useState([]);
-  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: doctors,
+    pagination,
+    loading,
+    error,
+    setPage,
+  } = usePaginatedQuery(exploreApi, "explore-doctors/", { pageSize: 5 });
 
+  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+
+  // Auto-select the first doctor whenever a new page loads
   useEffect(() => {
-    let cancelled = false;
-    const fetchDoctors = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await getDoctors();
-        if (!cancelled && res?.data?.data) {
-          const list = res.data.data;
-          setDoctors(list);
-          if (list.length > 0) {
-            setSelectedDoctorId(list[0].id);
-          }
-        }
-      } catch (err) {
-        if (!cancelled) {
-          const message =
-            err.response?.data?.message ||
-            err.message ||
-            "Failed to load doctors.";
-          setError(message);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchDoctors();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (doctors.length > 0 && !doctors.find((d) => d.id === selectedDoctorId)) {
+      setSelectedDoctorId(doctors[0].id);
+    }
+  }, [doctors, selectedDoctorId]);
 
   const selectedDoctor = useMemo(
     () => doctors.find((d) => d.id === selectedDoctorId) || null,
     [doctors, selectedDoctorId]
   );
 
-  if (loading) return <Loader />;
+  if (loading && doctors.length === 0) return <Loader />;
   if (error) return <ErrorMessage message={error} fullScreen />;
 
   return (
@@ -64,9 +46,9 @@ const ExploreDoctors = () => {
                 Find and connect with licensed healthcare professionals.
               </p>
             </div>
-            {doctors.length > 0 && (
+            {pagination.total > 0 && (
               <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                {doctors.length} available
+                {pagination.total} available
               </p>
             )}
           </div>
@@ -99,6 +81,11 @@ const ExploreDoctors = () => {
                 doctors={doctors}
                 selectedDoctorId={selectedDoctorId}
                 onSelectDoctor={setSelectedDoctorId}
+              />
+              <Paginator
+                pagination={pagination}
+                onPageChange={setPage}
+                className="border-t border-neutral-100 dark:border-neutral-800"
               />
             </section>
 
